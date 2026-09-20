@@ -144,6 +144,7 @@ class Trainer:
         self.model.train()
         total_loss = 0.0
         total_flops = 0
+        task_token_counts = {}
         batches = 0
         start_time = time.perf_counter()
         for batch in loader:
@@ -164,6 +165,15 @@ class Trainer:
             for task in tasks:
                 output = self._run_one(H, task, True)
                 outputs.append(output)
+                counts = task_token_counts.setdefault(
+                    task,
+                    {"num_tokens": 0, "num_visible_tokens": 0, "batches": 0},
+                )
+                counts["num_tokens"] += int(output["num_tokens"])
+                counts["num_visible_tokens"] += int(
+                    output["num_visible_tokens"]
+                )
+                counts["batches"] += 1
 
             total_loss_value = sum(output["loss"] for output in outputs) / len(
                 outputs
@@ -204,6 +214,7 @@ class Trainer:
             "estimated_forward_flops": float(total_flops),
             "parameter_count": float(parameter_count(self.model)),
             "peak_memory_bytes": float(peak_memory_bytes(self.device)),
+            "task_token_counts": task_token_counts,
         }
 
     @torch.no_grad()
@@ -215,6 +226,7 @@ class Trainer:
         values = []
         full_values = []
         total_flops = 0
+        task_token_counts = {}
         start_time = time.perf_counter()
         if self.device.type == "cuda":
             torch.cuda.reset_peak_memory_stats(self.device)
@@ -223,6 +235,15 @@ class Trainer:
             H = H.to(self.device)
             task = self._next_eval_task()
             output = self._run_one(H, task, False)
+            counts = task_token_counts.setdefault(
+                task,
+                {"num_tokens": 0, "num_visible_tokens": 0, "batches": 0},
+            )
+            counts["num_tokens"] += int(output["num_tokens"])
+            counts["num_visible_tokens"] += int(
+                output["num_visible_tokens"]
+            )
+            counts["batches"] += 1
             if isinstance(self.model, WiFoLikeBaseline):
                 values.append(
                     baseline_masked_nmse(
@@ -256,6 +277,7 @@ class Trainer:
             "estimated_forward_flops": float(total_flops),
             "parameter_count": float(parameter_count(self.model)),
             "peak_memory_bytes": float(peak_memory_bytes(self.device)),
+            "task_token_counts": task_token_counts,
         }
 
     @torch.no_grad()
@@ -271,6 +293,8 @@ class Trainer:
         values = []
         full_values = []
         total_flops = 0
+        total_tokens = 0
+        total_visible_tokens = 0
         start_time = time.perf_counter()
         if self.device.type == "cuda":
             torch.cuda.reset_peak_memory_stats(self.device)
@@ -280,6 +304,8 @@ class Trainer:
                 raise TypeError("CSI batches must be complex tensors")
             H = H.to(self.device)
             output = self._run_one(H, task, False)
+            total_tokens += int(output["num_tokens"])
+            total_visible_tokens += int(output["num_visible_tokens"])
             if isinstance(self.model, WiFoLikeBaseline):
                 values.append(
                     baseline_masked_nmse(
@@ -304,6 +330,7 @@ class Trainer:
             total_flops += self._estimate_output_flops(H, output)
         if not values:
             raise ValueError("evaluation loader yielded no batches")
+        batches = len(values)
         return {
             "nmse": sum(values) / len(values),
             "nmse_full": sum(full_values) / len(full_values),
@@ -311,6 +338,8 @@ class Trainer:
             "estimated_forward_flops": float(total_flops),
             "parameter_count": float(parameter_count(self.model)),
             "peak_memory_bytes": float(peak_memory_bytes(self.device)),
+            "num_tokens": float(total_tokens / batches),
+            "num_visible_tokens": float(total_visible_tokens / batches),
         }
 
     def make_scheduler(

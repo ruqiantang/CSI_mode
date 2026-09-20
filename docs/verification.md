@@ -4,7 +4,7 @@ Date: 2026-09-20
 
 ## Automated Verification
 
-- Unit tests: `64 passed`
+- Unit tests: `68 passed`
 - Package smoke test: passed
 - Python compilation: passed
 - CPU AMP training and evaluation: passed
@@ -87,6 +87,26 @@ held-out D17 test samples, two epochs, batch size two, and seed 17.
 Full UPA improved D4 validation but was slightly worse on the D17 shared-task
 average. This is not a zero-shot result and is not decision-grade; see
 `docs/formal-pilot.md`.
+
+## Reduced Six-Variant Ablation
+
+A CPU campaign compared WiFo, A, B, C, D, and Full over seeds `17`, `18`, and
+`19`. It used 64 official training samples each from D1 and D4, 16 D4
+validation samples, and 32 samples each from public D17 and D18. See
+`docs/ablation-campaign.md`.
+
+| Variant | D17 shared NMSE | D18 shared NMSE | D17 forward FLOPs | D18 forward FLOPs |
+|---|---:|---:|---:|---:|
+| WiFo | 1.0062662 | 1.0081864 | 19,743,768,576 | 33,698,217,984 |
+| A | 1.0108119 | 1.0158257 | 142,410,383,360 | 278,591,045,632 |
+| B | 1.0081189 | 1.0128658 | 142,410,383,360 | 278,591,045,632 |
+| C | 1.0081129 | 1.0128605 | 142,410,383,360 | 278,591,045,632 |
+| D | 1.0078653 | 1.0123407 | 142,410,383,360 | 278,591,045,632 |
+| Full | 1.0080195 | 1.0127561 | 142,410,383,360 | 278,591,045,632 |
+
+The WiFo-like baseline is best in this reduced run. Full UPA is worse by
+`0.0017533` on D17 and `0.0045697` on D18. The result is not a zero-shot
+paper-protocol comparison.
 
 ## Not Yet Verified
 

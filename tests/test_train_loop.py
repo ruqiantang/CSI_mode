@@ -99,6 +99,7 @@ def test_train_sample_schedule_and_evaluation() -> None:
         "estimated_forward_flops",
         "parameter_count",
         "peak_memory_bytes",
+        "task_token_counts",
     }
     assert set(evaluation) == {
         "nmse",
@@ -107,6 +108,7 @@ def test_train_sample_schedule_and_evaluation() -> None:
         "estimated_forward_flops",
         "parameter_count",
         "peak_memory_bytes",
+        "task_token_counts",
     }
 
 
@@ -124,9 +126,13 @@ def test_evaluate_task_reports_each_available_task() -> None:
             "estimated_forward_flops",
             "parameter_count",
             "peak_memory_bytes",
+            "num_tokens",
+            "num_visible_tokens",
         }
         assert result["nmse"] >= 0
         assert result["nmse_full"] >= 0
+        assert result["num_tokens"] > 0
+        assert 0 <= result["num_visible_tokens"] <= result["num_tokens"]
 
     with pytest.raises(ValueError):
         trainer.evaluate_task(loader, "not-a-task")

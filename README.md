@@ -50,6 +50,8 @@ The proposed model is feasible as a first research prototype:
   split on the public D17 test file for early same-distribution comparison.
 - `scripts/run_formal_pilot.py`: controlled pilot using official
   train/validation files and a held-out test file.
+- `scripts/run_campaign.py`: reproducible multi-variant, multi-seed ablation
+  campaign with JSON metrics.
 - `docs/model-spec.md`: complete tensor, token, positional-encoding, bias,
   masking, decoder, and loss specification.
 - `docs/source-audit.md`: comparison of the proposed design against the official
@@ -69,6 +71,8 @@ The proposed model is feasible as a first research prototype:
 - `docs/public-split-pilot.md`: public-test-only split pilot and its current
   result.
 - `docs/formal-pilot.md`: official D4 train/validation to held-out D17 pilot.
+- `docs/ablation-campaign.md`: reduced six-variant, three-seed ablation on
+  official D1 and D4 data.
 
 ## Quick Verification
 
