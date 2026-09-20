@@ -15,7 +15,7 @@
 Use the official D1-D16 datasets for pre-training and D17-D19 for zero-shot
 evaluation.
 
-The public D1-D18 configurations include:
+The paper's D1-D19 configurations include:
 
 - `T=16` or `24`
 - `K=32`, `64`, or `128`
@@ -30,7 +30,7 @@ The first implementation should require exact divisibility by `pt=4` and
 | Run | Conv patch | Position | UPA bias | Spatial mask | Purpose |
 |---|---|---|---|---|---|
 | WiFo | `(4,4,4)` | `(t,f,s)` | No | No | Official baseline |
-| A | `(4,4,1)` | `(t,f,s)` | No | No | Remove cross-antenna convolution |
+| A | `(4,4,1)` | Compatible control `(t,f,s)` | No | No | Remove cross-antenna convolution |
 | B | `(4,4,1)` | `(t,f,r,c)` | No | No | Add 2D UPA coordinates |
 | C | `(4,4,1)` | `(t,f,r,c)` | Yes | No | Add relative geometry |
 | D | `(4,4,1)` | `(t,f,r,c)` | Yes | Antenna | Add partial-array reconstruction |
@@ -132,7 +132,8 @@ geometric extrapolation.
 
 The first prototype is successful if:
 
-1. It trains without shape or mask-order errors across all 16 configurations.
+1. It trains without shape or mask-order errors across all D1-D19
+   configurations.
 2. It preserves temporal and frequency prediction within a small tolerance of
    the strongest baseline.
 3. It improves partial-antenna reconstruction.
@@ -143,10 +144,11 @@ The ablation must identify which architectural change causes the effect.
 
 ## 8. Implementation Milestones
 
-1. **Shape harness:** synthetic complex tensors for every supported UPA shape;
-   assert convolution, token, mask, decoder, and unpatchify round trips.
-2. **Ablation A:** antenna-independent convolution with original flattened
-   spatial coordinate.
+1. **Shape harness:** synthetic complex tensors for every D1-D19 UPA/T/K
+   configuration; assert convolution, token, mask, decoder, and unpatchify round
+   trips.
+2. **Ablation A:** antenna-independent convolution with compatible-control
+   `(t,f,s)` PE, where `s=r*Nv+c`; do not use full 4D PE.
 3. **Ablation B:** exact 4D positional encoding.
 4. **Ablation C:** UPA relative bias.
 5. **Ablation D:** antenna masking.
@@ -170,6 +172,10 @@ scaling if the attention implementation cannot hold the activation memory.
 If the full model is too expensive, do not immediately redesign the model.
 First finish WiFo-Small and Little experiments so the architectural signal is
 known before optimizing sequence length.
+
+Do not cache a persistent `[num_heads,L,L]` relative-bias matrix. Cache only
+`dr_index` and `dc_index`, and materialize the bias transiently during each
+attention forward.
 
 When using `task_schedule="sequential"`, multiply the per-batch reconstruction
 cost by four. Estimate both schedules separately:

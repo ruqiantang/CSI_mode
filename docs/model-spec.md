@@ -172,8 +172,17 @@ The bias is applied in both the encoder and decoder. This is required because
 masked antennas are absent from the encoder and are reconstructed only by the
 decoder.
 
-For the public D1-D18 datasets, the largest UPA is `4 x 8`, so the training
+For the paper's D1-D19 datasets, the largest UPA is `4 x 8`, so the training
 range is `delta_r in [-3,3]` and `delta_c in [-7,7]`.
+
+The implementation must not permanently cache the full `[num_heads,L,L]` bias
+matrix. It should cache only `dr_index` and `dc_index`, then compute:
+
+```text
+bias = row_bias[:,dr_index] + col_bias[:,dc_index]
+```
+
+during each attention forward.
 
 The main zero-shot geometry experiments must stay within the relative-distance
 range covered by the trained tables. For example, if `|delta_c| <= 7` during
@@ -211,10 +220,10 @@ batch. The spatial task internally samples one strategy:
 - full column
 - local rectangular sub-array block
 
-All masks are represented over token coordinates:
+All masks are represented over flattened token coordinates:
 
 ```text
-M in {0,1}^(T' x K' x Nh x Nv)
+M in {0,1}^(B x L)
 ```
 
 `M=1` denotes a masked token, and `M=0` denotes a visible token.
@@ -238,6 +247,18 @@ leaves a spatial visible ratio of `24/32 = 0.75`.
 For `Nh=1`, row masking is unavailable and the spatial sampler selects among
 antenna, column, and block. No strategy may mask every antenna. The first
 single-antenna spatial ratio is 25%; the main comparison should also run 50%.
+
+The mask API is uniform across all four tasks:
+
+```text
+mask: BoolTensor[B,L]
+False = visible
+True  = masked
+```
+
+Spatial masks may be generated first over `[B,Nh,Nv]`, but they are broadcast
+to all time-frequency patches and flattened using the frozen `(t,k,r,c)`
+ordering before leaving the mask generator.
 
 ## 8. Encoder, Decoder, and Reconstruction
 
@@ -268,6 +289,20 @@ and then converted to complex:
 
 ```text
 H_hat = X_hat[:,0] + 1j*X_hat[:,1]
+```
+
+The model forward returns a diagnostic dictionary rather than only `H_hat`:
+
+```text
+{
+  prediction,
+  loss,
+  mask,
+  visible_mask,
+  coords,
+  num_tokens,
+  num_visible_tokens,
+}
 ```
 
 ## 9. Loss

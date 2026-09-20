@@ -111,7 +111,7 @@ B(delta_r, delta_c) = b_r(delta_r) + b_c(delta_c)
 This gives a clean ablation and avoids the quadratic memory of an explicit
 `delta_r x delta_c` table.
 
-The public D1-D18 training range covers `|delta_r| <= 3` and
+The paper's D1-D19 training range covers `|delta_r| <= 3` and
 `|delta_c| <= 7`. The first zero-shot experiments should remain within that
 covered range. Clamping is only an out-of-range guard. A larger-UPA
 extrapolation study requires a continuous relative-distance parameterization

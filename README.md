@@ -43,6 +43,8 @@ The proposed model is feasible as a first research prototype:
   and compute budget.
 - `docs/references.md`: canonical links for the paper, source commit, datasets,
   and pretrained weights.
+- `docs/implementation-plan-v1.md`: frozen v1 repository layout, APIs,
+  ablation variants, development order, and acceptance criteria.
 
 ## Scope
 

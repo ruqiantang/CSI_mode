@@ -37,6 +37,9 @@ them.
   `https://huggingface.co/datasets/pku-pcni-lab/RF-only_channel_dataset_for_WiFo`
 - Public files include `dataset/D1/X_test.mat` through
   `dataset/D18/X_test.mat`.
+- The paper defines D1-D19. The current public Hugging Face listing shown above
+  includes D1-D18, so D19 must be covered by the synthetic shape harness until
+  its data file is separately obtained.
 
 The public repository does not include full training splits. The pre-training
 dataset is linked from the official WiFo README at:
