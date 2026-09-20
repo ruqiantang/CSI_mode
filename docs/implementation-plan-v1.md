@@ -50,6 +50,15 @@ The causal chain is:
 3. `C > B`: relative UPA geometry is useful.
 4. `D > C`: spatial reconstruction pretraining is useful.
 
+The configuration mapping is explicit:
+
+```text
+allow_spatial_mask=false       -> A, B, and C
+allow_spatial_mask=true
+spatial_types=("antenna",)     -> D
+spatial_types=(all four)       -> Full, Base, Small, and Little
+```
+
 ## 3. Frozen Repository Layout
 
 ```text

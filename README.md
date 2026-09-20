@@ -35,6 +35,13 @@ The proposed model is feasible as a first research prototype:
 
 ## Project Contents
 
+- `src/wifo_upa/`: V1 implementation of antenna-independent TF embedding,
+  4D/control positional encodings, structured masks, UPA relative bias,
+  training, evaluation, and the WiFo-like baseline.
+- `configs/`: base, Small, Little, and frozen A/B/C/D/Full ablation variants.
+- `tests/`: geometry, embedding, PE, mask, attention, model, training-loop,
+  and D1-D19 dataset-shape contracts.
+- `scripts/`: ablation and dataset download entry points.
 - `docs/model-spec.md`: complete tensor, token, positional-encoding, bias,
   masking, decoder, and loss specification.
 - `docs/source-audit.md`: comparison of the proposed design against the official
@@ -46,12 +53,22 @@ The proposed model is feasible as a first research prototype:
 - `docs/implementation-plan-v1.md`: frozen v1 repository layout, APIs,
   ablation variants, development order, and acceptance criteria.
 
+## Quick Verification
+
+```bash
+python -m venv .venv
+.venv/bin/pip install -e ".[dev]"
+.venv/bin/pytest
+.venv/bin/python -m wifo_upa.smoke_test
+```
+
 ## Scope
 
-This repository currently contains documentation and an implementation plan. It
-does not contain modified WiFo code, simulation datasets, TensorBoard logs, or
-model checkpoints. The first implementation should be based on the official
-repository at commit `a0889e124aeb9dcc423fc37e6796f77c7c4f7f24`.
+This repository contains documentation and an independent V1 reference
+implementation. It does not copy modified WiFo source code and does not contain
+simulation datasets, TensorBoard logs, or model checkpoints. The official source
+audit is based on repository commit
+`a0889e124aeb9dcc423fc37e6796f77c7c4f7f24`.
 
 The GitHub repository is intended to remain private until the research result
 and publication plan are settled. No open-source license is added for now.
