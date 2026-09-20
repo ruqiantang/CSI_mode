@@ -69,6 +69,19 @@ memory and runtime for a representative `4x8` sample.
 Do not warm-start any run in the ablation table. Warm starting would conflate
 the official pretraining distribution with the architectural change.
 
+### Task Schedule
+
+Implement both modes before running the ablation:
+
+- `task_schedule="sample"`: uniformly sample one of random, temporal,
+  frequency, and spatial per batch. Use this for early structural validation.
+- `task_schedule="sequential"`: run all four tasks on each batch and average
+  their losses. Use this for the final strict comparison with WiFo.
+
+The sampled schedule substantially reduces training cost. It is not equivalent
+to sequential optimization, so the schedule must be recorded with every
+result.
+
 ## 5. Task Ratios
 
 Use the official ratios first:
@@ -82,9 +95,15 @@ For spatial masking, run two settings:
 - antenna mask ratio `0.25`
 - antenna mask ratio `0.50`
 
-The spatial mask generator must always leave at least 50% of tokens visible.
-For row, column, and block strategies, sample masks until the invariant holds;
-do not arbitrarily truncate a generated mask because that changes the intended
+Define spatial visibility over UPA elements:
+
+```text
+R_visible_space = |visible antennas| / (Nh*Nv)
+```
+
+The spatial mask generator must enforce `R_visible_space >= 0.5`. For row,
+column, and block strategies, sample masks until the invariant holds; do not
+arbitrarily truncate a generated mask because that changes the intended
 geometry.
 
 ## 6. Metrics
@@ -104,7 +123,10 @@ Secondary:
 - per-UPA-shape breakdown
 
 For zero-shot geometry, hold out one or more UPA shapes from training and
-report both clamped relative-bias behavior and absolute 4D PE extrapolation.
+report absolute 4D PE extrapolation and relative-bias behavior within the
+distance range covered by the trained tables. Delta clamping is only an
+out-of-range fallback and must not be presented as evidence of larger-array
+geometric extrapolation.
 
 ## 7. Success Criteria
 
@@ -148,3 +170,11 @@ scaling if the attention implementation cannot hold the activation memory.
 If the full model is too expensive, do not immediately redesign the model.
 First finish WiFo-Small and Little experiments so the architectural signal is
 known before optimizing sequence length.
+
+When using `task_schedule="sequential"`, multiply the per-batch reconstruction
+cost by four. Estimate both schedules separately:
+
+```text
+sample: one task forward/backward pass per batch
+sequential: four task forward/backward passes per batch
+```

@@ -12,6 +12,10 @@ The proposed model is feasible as a first research prototype:
   frequency and antenna dimensions are convolved locally.
 - Replacing that with a shared single-antenna time-frequency `Conv3d`,
   followed by a UPA-aware Transformer, is a coherent structural change.
+- The central narrative is **antenna-independent time-frequency embedding plus
+  a geometry-aware UPA Transformer**. The change is not merely a new positional
+  encoding: spatial modeling moves from the convolutional embedding to the
+  Transformer.
 - The main cost is sequence length. WiFo's antenna patching divides the number
   of antenna positions by four, while the proposed model keeps one token per
   antenna position. Attention matrix size therefore grows by approximately
@@ -20,6 +24,14 @@ The proposed model is feasible as a first research prototype:
   its `TrainLoop.run_loop()` method invokes evaluation and does not implement
   the full pre-training loop described in the paper. A training entry point
   must be added before running the proposed experiments.
+- Relative-position lookup clamping is an engineering fallback, not the claimed
+  generalization mechanism. The main zero-shot experiments must stay within the
+  relative-distance range covered by the trained bias tables.
+- Spatial visibility is defined over antenna elements, not over time-frequency
+  tokens. At least half of the UPA elements must remain visible.
+- Training must support both `task_schedule="sample"` for efficient structural
+  validation and `task_schedule="sequential"` for a strict WiFo-style
+  comparison in which all four tasks are run on each batch.
 
 ## Project Contents
 

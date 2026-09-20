@@ -111,6 +111,12 @@ B(delta_r, delta_c) = b_r(delta_r) + b_c(delta_c)
 This gives a clean ablation and avoids the quadratic memory of an explicit
 `delta_r x delta_c` table.
 
+The public D1-D18 training range covers `|delta_r| <= 3` and
+`|delta_c| <= 7`. The first zero-shot experiments should remain within that
+covered range. Clamping is only an out-of-range guard. A larger-UPA
+extrapolation study requires a continuous relative-distance parameterization
+or buckets and should be run separately.
+
 ## 6. Mask Strategies
 
 The public repository implements:
@@ -144,7 +150,16 @@ gradients, step the optimizer, or apply the paper's cosine schedule.
 
 The paper reports AdamW, weight decay 0.05, batch size 128, 200 epochs, a
 five-epoch warmup, and base learning rate `5e-4`. A new training loop must
-implement those settings, plus the four-task sampling rule and checkpointing.
+implement those settings, checkpointing, and both task schedules:
+
+- `sequential`: run random, temporal, frequency, and spatial tasks on every
+  batch, then average the four losses. This is the strict WiFo-style mode.
+- `sample`: sample one task uniformly per batch. This reduces cost during
+  structural validation and must be disclosed in every result.
+
+The sequential mode is materially more expensive because the proposed token
+count is already four times the original count while each batch requires four
+forward and backward reconstructions.
 
 This is a material gap: the extension cannot be trained by simply adding
 modules to the current inference-only entry point.
