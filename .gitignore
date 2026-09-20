@@ -1,0 +1,30 @@
+# Data and model artifacts
+*.mat
+*.pkl
+*.pth
+*.pt
+*.ckpt
+
+# Experiment outputs
+logs/
+runs/
+experiments/
+result*.txt
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+
+# System and editor state
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Local secrets
+.env
+*.token
