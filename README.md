@@ -42,6 +42,8 @@ The proposed model is feasible as a first research prototype:
 - `tests/`: geometry, embedding, PE, mask, attention, model, baseline,
   evaluation, training-loop, and D1-D19 dataset-shape contracts.
 - `scripts/`: ablation and dataset download entry points.
+- `scripts/verify_cuda.py`: required CUDA forward/backward and AMP check.
+- `scripts/evaluate_checkpoint.py`: task-specific checkpoint evaluation.
 - `docs/model-spec.md`: complete tensor, token, positional-encoding, bias,
   masking, decoder, and loss specification.
 - `docs/source-audit.md`: comparison of the proposed design against the official
@@ -56,6 +58,8 @@ The proposed model is feasible as a first research prototype:
   metric contracts.
 - `docs/verification.md`: current automated, real-data, AMP, and unverified
   platform status.
+- `docs/execution-runbook.md`: CUDA, public-data, checkpoint, zero-shot, and
+  formal-training procedures.
 
 ## Quick Verification
 

@@ -258,6 +258,61 @@ class Trainer:
             "peak_memory_bytes": float(peak_memory_bytes(self.device)),
         }
 
+    @torch.no_grad()
+    def evaluate_task(
+        self,
+        loader: Iterable[torch.Tensor],
+        task: str,
+    ) -> Dict[str, float]:
+        """Evaluate one reconstruction task over every batch in a loader."""
+        if task not in self.available_tasks():
+            raise ValueError(f"task {task!r} is not available for this model")
+        self.model.eval()
+        values = []
+        full_values = []
+        total_flops = 0
+        start_time = time.perf_counter()
+        if self.device.type == "cuda":
+            torch.cuda.reset_peak_memory_stats(self.device)
+        for batch in loader:
+            H = batch[0] if isinstance(batch, (tuple, list)) else batch
+            if not isinstance(H, torch.Tensor) or not torch.is_complex(H):
+                raise TypeError("CSI batches must be complex tensors")
+            H = H.to(self.device)
+            output = self._run_one(H, task, False)
+            if isinstance(self.model, WiFoLikeBaseline):
+                values.append(
+                    baseline_masked_nmse(
+                        H,
+                        output["prediction"],
+                        output["mask"],
+                        self.model.config.pt,
+                        self.model.config.pf,
+                    )
+                )
+            else:
+                values.append(
+                    masked_nmse(
+                        H,
+                        output["prediction"],
+                        output["mask"],
+                        self.model.config.pt,
+                        self.model.config.pf,
+                    )
+                )
+            full_values.append(nmse_full(H, output["prediction"]))
+            total_flops += self._estimate_output_flops(H, output)
+        if not values:
+            raise ValueError("evaluation loader yielded no batches")
+        return {
+            "nmse": sum(values) / len(values),
+            "nmse_full": sum(full_values) / len(full_values),
+            "inference_time_seconds": time.perf_counter() - start_time,
+            "estimated_forward_flops": float(total_flops),
+            "parameter_count": float(parameter_count(self.model)),
+            "peak_memory_bytes": float(peak_memory_bytes(self.device)),
+        }
+
     def make_scheduler(
         self,
         total_steps: int,

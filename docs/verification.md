@@ -4,7 +4,7 @@ Date: 2026-09-20
 
 ## Automated Verification
 
-- Unit tests: `58 passed`
+- Unit tests: `59 passed`
 - Package smoke test: passed
 - Python compilation: passed
 - CPU AMP training and evaluation: passed
@@ -57,6 +57,14 @@ task's visible-token ratio.
 ## Not Yet Verified
 
 - CUDA forward/backward and CUDA AMP.
-- Full training-scale convergence and D17-D19 zero-shot evaluation.
+- Formal D1-D16 pretraining and D17-D19 zero-shot performance.
+- Public D19 MATLAB data: the public Hugging Face listing currently provides
+  D1-D18 test files only.
+
+## Reproducibility Entry Points
+
+`scripts/verify_cuda.py` is the required entry point on a CUDA machine.
+`scripts/run_ablation.py --save-checkpoint` writes a resumable checkpoint, and
+`scripts/evaluate_checkpoint.py` reports task-specific zero-shot metrics.
 - The FLOPs estimate is analytic and excludes I/O, Python overhead, loss
   reduction, and checkpointing.

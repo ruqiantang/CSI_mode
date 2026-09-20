@@ -45,6 +45,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--amp", action="store_true")
     parser.add_argument("--device", default=None)
+    parser.add_argument(
+        "--save-checkpoint",
+        type=Path,
+        help="Write a resumable checkpoint after the final epoch",
+    )
     args = parser.parse_args()
     if args.variant is None and args.config is None:
         parser.error("one of --variant or --config is required")
@@ -101,6 +106,19 @@ def main() -> None:
             f"nmse_full={evaluation['nmse_full']:.6f} "
             f"eval_flops={int(evaluation['estimated_forward_flops'])}"
         )
+    if args.save_checkpoint is not None:
+        args.save_checkpoint.parent.mkdir(parents=True, exist_ok=True)
+        trainer.save_checkpoint(
+            args.save_checkpoint,
+            epoch=args.epochs,
+            extra={
+                "variant": args.variant,
+                "config": model.config.to_dict(),
+                "model_type": "baseline" if args.variant == "wifo" else "upa",
+                "dataset": args.dataset,
+            },
+        )
+        print(f"checkpoint={args.save_checkpoint}")
 
 
 if __name__ == "__main__":

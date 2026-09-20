@@ -1,6 +1,7 @@
 from pathlib import Path
 import math
 
+import pytest
 import torch
 from torch.utils.data import DataLoader
 
@@ -107,6 +108,28 @@ def test_train_sample_schedule_and_evaluation() -> None:
         "parameter_count",
         "peak_memory_bytes",
     }
+
+
+def test_evaluate_task_reports_each_available_task() -> None:
+    model = tiny_model()
+    trainer = Trainer(model, task_schedule="sample", device="cpu")
+    loader = tiny_loader()
+
+    for task in trainer.available_tasks():
+        result = trainer.evaluate_task(loader, task)
+        assert set(result) == {
+            "nmse",
+            "nmse_full",
+            "inference_time_seconds",
+            "estimated_forward_flops",
+            "parameter_count",
+            "peak_memory_bytes",
+        }
+        assert result["nmse"] >= 0
+        assert result["nmse_full"] >= 0
+
+    with pytest.raises(ValueError):
+        trainer.evaluate_task(loader, "not-a-task")
 
 
 def test_checkpoint_roundtrip(tmp_path: Path) -> None:
