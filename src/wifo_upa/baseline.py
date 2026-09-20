@@ -13,6 +13,38 @@ from .masks import make_mask
 from .pe import _even_allocation, _sincos_1d
 
 
+@torch.no_grad()
+def baseline_masked_nmse(
+    H: torch.Tensor,
+    prediction: torch.Tensor,
+    mask: torch.Tensor,
+    pt: int,
+    pf: int,
+) -> float:
+    """Compute masked NMSE for flattened-antenna WiFo tokens."""
+    if H.shape != prediction.shape:
+        raise ValueError("target and prediction shapes differ")
+    target = _patchify_wifo(
+        torch.stack((H.real, H.imag), dim=1), pt, pf
+    )
+    pred = _patchify_wifo(
+        torch.stack((prediction.real, prediction.imag), dim=1), pt, pf
+    )
+    if mask.shape != target.shape[:2]:
+        raise ValueError(
+            f"mask shape {tuple(mask.shape)} does not match "
+            f"{tuple(target.shape[:2])}"
+        )
+    if not mask.any():
+        raise ValueError("cannot compute NMSE with an empty mask")
+    error = ((pred - target) ** 2).sum(dim=-1)
+    power = (target**2).sum(dim=-1)
+    return float(
+        (error[mask.to(target.device)]).sum().item()
+        / power[mask.to(target.device)].sum().item()
+    )
+
+
 class WiFoPatchEmbed(nn.Module):
     def __init__(self, embed_dim: int, pt: int = 4, pf: int = 4) -> None:
         super().__init__()

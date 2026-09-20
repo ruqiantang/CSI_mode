@@ -94,6 +94,8 @@ tests/
   test_pe.py
   test_attention.py
   test_model.py
+  test_baseline.py
+  test_evaluate.py
   test_train_loop.py
   test_data.py
 
@@ -124,8 +126,14 @@ inverse_token_index(l, Kp, Nh, Nv)
 build_coords(Tp, Kp, Nh, Nv)
 reshape_upa(x, shape_before, shape_after)
 patchify_tf(x, pt, pf)
+flatten_token_patches(patches)
+unflatten_token_patches(x, T, K, Nh, Nv, pt, pf)
 unpatchify_tf(x, T, K, Nh, Nv, pt, pf)
 ```
+
+`patchify_tf()` returns the structured grid
+`[B,Tp,Kp,Nh,Nv,2,pt,pf]`. `flatten_token_patches()` is the explicit model
+representation used for `[B,L,2*pt*pf]`.
 
 Token order is always:
 
@@ -190,6 +198,13 @@ variant A:
 (t,k,s), s = r*Nv + c
 ```
 
+with widths:
+
+```text
+D_t = D_k = floor(D/3)
+D_s = D - 2*floor(D/3)
+```
+
 The 4D encoding is:
 
 ```text
@@ -242,6 +257,10 @@ The encoder is therefore mask-type agnostic:
 ```python
 visible_tokens = tokens[~mask]
 ```
+
+The batch-shared indices are represented by `MaskLayout`, which exposes
+`mask`, `visible_mask`, `visible_ids`, `masked_ids`, `coords`, and token counts
+in one validated object.
 
 Spatial visibility is defined over antenna elements:
 

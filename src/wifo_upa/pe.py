@@ -7,17 +7,6 @@ from typing import Sequence
 import torch
 
 
-# WiFo-compatible three-coordinate SinCos widths. These keep the first two
-# coordinates equal and put the parity remainder in the spatial coordinate.
-CONTROL_PE_SIZES = {
-    64: (22, 22, 20),
-    128: (42, 42, 44),
-    256: (86, 86, 84),
-    512: (170, 170, 172),
-    768: (256, 256, 256),
-}
-
-
 def _check_even_split(dim: int, parts: int) -> None:
     if dim <= 0 or dim % parts != 0 or (dim // parts) % 2 != 0:
         raise ValueError(
@@ -26,30 +15,30 @@ def _check_even_split(dim: int, parts: int) -> None:
 
 
 def _even_allocation(dim: int, parts: int) -> list[int]:
-    """Allocate dimensions in even chunks using WiFo's three-coordinate widths."""
+    """Allocate three-coordinate widths using the frozen ``floor(D/3)`` rule."""
     if dim <= 0 or parts <= 0:
         raise ValueError("dim and parts must be positive")
-    if parts == 3 and dim in CONTROL_PE_SIZES:
-        return list(CONTROL_PE_SIZES[dim])
     if parts != 3:
         raise ValueError("only three-coordinate allocations are supported")
-    base = int(round(dim / 3 / 2) * 2)
-    remainder = dim - 2 * base
-    if base <= 0 or remainder <= 0 or remainder % 2:
-        raise ValueError(f"could not allocate even positional widths for D={dim}")
-    return [base, base, remainder]
+    width = dim // 3
+    remainder = dim - 2 * width
+    if width <= 0 or remainder <= 0:
+        raise ValueError(f"could not allocate positional widths for D={dim}")
+    return [width, width, remainder]
 
 
 def _sincos_1d(positions: torch.Tensor, dim: int) -> torch.Tensor:
-    """Standard paired sine/cosine encoding for a single coordinate."""
-    if dim <= 0 or dim % 2:
-        raise ValueError(f"1D SinCos dimension must be positive and even, got {dim}")
+    """SinCos encoding, allowing odd widths with one extra cosine feature."""
+    if dim <= 0:
+        raise ValueError(f"1D SinCos dimension must be positive, got {dim}")
     pos = positions.reshape(-1).to(torch.float32)
-    omega = torch.arange(dim // 2, dtype=torch.float32, device=pos.device)
-    omega = omega / (dim // 2)
+    omega = torch.arange((dim + 1) // 2, dtype=torch.float32, device=pos.device)
+    omega = omega / ((dim + 1) // 2)
     omega = 1.0 / (10000**omega)
     angles = torch.outer(pos, omega)
-    return torch.cat((torch.sin(angles), torch.cos(angles)), dim=1)
+    return torch.cat(
+        (torch.sin(angles[:, : dim // 2]), torch.cos(angles)), dim=1
+    )
 
 
 def build_positional_encoding(

@@ -1,4 +1,5 @@
 from pathlib import Path
+import math
 
 import torch
 from torch.utils.data import DataLoader
@@ -51,8 +52,26 @@ def test_train_sample_schedule_and_evaluation() -> None:
     model = tiny_model()
     trainer = Trainer(model, task_schedule="sample", lr=1e-3, device="cpu")
     loader = tiny_loader()
-    assert trainer.train_epoch(loader)["loss"] > 0
-    assert trainer.evaluate(loader)["nmse"] >= 0
+    metrics = trainer.train_epoch(loader)
+    evaluation = trainer.evaluate(loader)
+    assert metrics["loss"] > 0
+    assert evaluation["nmse"] >= 0
+    assert set(metrics) == {
+        "loss",
+        "batches",
+        "train_time_seconds",
+        "estimated_forward_flops",
+        "parameter_count",
+        "peak_memory_bytes",
+    }
+    assert set(evaluation) == {
+        "nmse",
+        "nmse_full",
+        "inference_time_seconds",
+        "estimated_forward_flops",
+        "parameter_count",
+        "peak_memory_bytes",
+    }
 
 
 def test_checkpoint_roundtrip(tmp_path: Path) -> None:
@@ -75,6 +94,18 @@ def test_scheduler_runs() -> None:
     assert trainer.scheduler is scheduler
 
 
+def test_cpu_amp_train_and_evaluate() -> None:
+    trainer = Trainer(
+        tiny_model(), task_schedule="sample", lr=1e-3, use_amp=True, device="cpu"
+    )
+    loader = tiny_loader()
+    metrics = trainer.train_epoch(loader)
+    evaluation = trainer.evaluate(loader)
+    assert math.isfinite(metrics["loss"])
+    assert math.isfinite(evaluation["nmse"])
+    assert math.isfinite(evaluation["nmse_full"])
+
+
 def test_spatial_pretraining_strategy_follows_variant_config() -> None:
     values = {
         "embed_dim": 16,
@@ -88,7 +119,8 @@ def test_spatial_pretraining_strategy_follows_variant_config() -> None:
         "spatial_types": ("antenna",),
     }
     trainer = Trainer(UPAMAE(ModelConfig.from_dict(values)), device="cpu")
-    assert trainer._sample_spatial_type() == "antenna"
+    H = torch.complex(torch.randn(1, 8, 8, 1, 4), torch.randn(1, 8, 8, 1, 4))
+    assert trainer._sample_spatial_type(H) == "antenna"
 
 
 def test_frozen_ablation_d_and_full_configs() -> None:

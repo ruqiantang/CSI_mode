@@ -6,6 +6,7 @@ source of truth for the frozen token ordering ``(t, k, r, c)``.
 
 from __future__ import annotations
 
+import math
 from typing import Sequence, Tuple
 
 import torch
@@ -100,14 +101,14 @@ def reshape_upa(
 
 
 def patchify_tf(x: torch.Tensor, pt: int, pf: int) -> torch.Tensor:
-    """Patch a real/imaginary tensor into token-major reconstruction targets.
+    """Patch a real/imaginary tensor into a structured token grid.
 
     Input:
       ``[B,2,T,K,Nh,Nv]``
 
     Output:
-      ``[B,L,2*pt*pf]`` with token order ``(t,k,r,c)`` and patch values ordered
-      as ``[channel, time, frequency]``.
+      ``[B,Tp,Kp,Nh,Nv,2,pt,pf]`` with token axes ordered as
+      ``(t,k,r,c)`` and patch values ordered as ``[channel,time,frequency]``.
     """
     if x.ndim != 6 or x.shape[1] != 2:
         raise ValueError(f"expected [B,2,T,K,Nh,Nv], got {tuple(x.shape)}")
@@ -120,7 +121,52 @@ def patchify_tf(x: torch.Tensor, pt: int, pf: int) -> torch.Tensor:
     Tp, Kp = T // pt, K // pf
     y = x.reshape(B, 2, Tp, pt, Kp, pf, Nh, Nv)
     y = torch.permute(y, (0, 2, 4, 6, 7, 1, 3, 5))
-    return y.reshape(B, Tp * Kp * Nh * Nv, 2 * pt * pf)
+    return y
+
+
+def flatten_token_patches(patches: torch.Tensor) -> torch.Tensor:
+    """Flatten a structured patch grid to the model's ``[B,L,V]`` layout."""
+    if patches.ndim != 8 or patches.shape[5] != 2:
+        raise ValueError(
+            "expected [B,Tp,Kp,Nh,Nv,2,pt,pf], got "
+            f"{tuple(patches.shape)}"
+        )
+    B = patches.shape[0]
+    L = math.prod(patches.shape[1:5])
+    values = math.prod(patches.shape[5:])
+    return patches.reshape(B, L, values)
+
+
+def unflatten_token_patches(
+    x: torch.Tensor,
+    T: int,
+    K: int,
+    Nh: int,
+    Nv: int,
+    pt: int,
+    pf: int,
+) -> torch.Tensor:
+    """Invert :func:`flatten_token_patches` for known CSI geometry."""
+    if x.ndim != 3:
+        raise ValueError(f"expected [B,L,V], got {tuple(x.shape)}")
+    _check_positive_int(T, "T")
+    _check_positive_int(K, "K")
+    _check_positive_int(Nh, "Nh")
+    _check_positive_int(Nv, "Nv")
+    _check_positive_int(pt, "pt")
+    _check_positive_int(pf, "pf")
+    if T % pt or K % pf:
+        raise ValueError(
+            f"T={T} and K={K} must be divisible by pt={pt}, pf={pf}"
+        )
+    Tp, Kp = T // pt, K // pf
+    expected = (Tp, Kp, Nh, Nv, 2, pt, pf)
+    if x.shape[1] != Tp * Kp * Nh * Nv or x.shape[2] != 2 * pt * pf:
+        raise ValueError(
+            f"expected token/value dimensions "
+            f"{(Tp * Kp * Nh * Nv, 2 * pt * pf)}, got {tuple(x.shape[1:])}"
+        )
+    return x.reshape(x.shape[0], *expected)
 
 
 def unpatchify_tf(
@@ -133,8 +179,6 @@ def unpatchify_tf(
     pf: int,
 ) -> torch.Tensor:
     """Invert :func:`patchify_tf`."""
-    if x.ndim != 3:
-        raise ValueError(f"expected [B,L,2*pt*pf], got {tuple(x.shape)}")
     _check_positive_int(T, "T")
     _check_positive_int(K, "K")
     _check_positive_int(Nh, "Nh")
@@ -144,16 +188,13 @@ def unpatchify_tf(
     if T % pt or K % pf:
         raise ValueError(f"T={T} and K={K} must be divisible by pt={pt}, pf={pf}")
 
-    B, L, values = x.shape
     Tp, Kp = T // pt, K // pf
-    expected_l = Tp * Kp * Nh * Nv
-    expected_values = 2 * pt * pf
-    if L != expected_l or values != expected_values:
+    expected = (Tp, Kp, Nh, Nv, 2, pt, pf)
+    if x.shape[1:] != expected:
         raise ValueError(
-            f"expected L={expected_l} and values={expected_values}, "
-            f"got L={L}, values={values}"
+            f"expected structured patches {expected}, got {tuple(x.shape[1:])}"
         )
 
-    y = x.reshape(B, Tp, Kp, Nh, Nv, 2, pt, pf)
+    y = x
     y = torch.permute(y, (0, 5, 1, 6, 2, 7, 3, 4))
-    return y.reshape(B, 2, T, K, Nh, Nv)
+    return y.reshape(x.shape[0], 2, T, K, Nh, Nv)

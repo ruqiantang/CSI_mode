@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-from wifo_upa.pe import CONTROL_PE_SIZES, build_positional_encoding
+from wifo_upa.pe import _even_allocation, _sincos_1d, build_positional_encoding
 
 
 def test_4d_pe_shape_and_feature_blocks() -> None:
@@ -30,11 +30,18 @@ def test_control_pe_uses_flattened_upa_coordinate() -> None:
     assert torch.equal(pe[0], pe[1])
 
 
-def test_control_pe_uses_wifo_dimension_split() -> None:
-    assert CONTROL_PE_SIZES[64] == (22, 22, 20)
-    assert CONTROL_PE_SIZES[128] == (42, 42, 44)
-    assert CONTROL_PE_SIZES[256] == (86, 86, 84)
-    assert CONTROL_PE_SIZES[512] == (170, 170, 172)
+def test_control_pe_uses_floor_dimension_split() -> None:
+    assert _even_allocation(64, 3) == [21, 21, 22]
+    assert _even_allocation(128, 3) == [42, 42, 44]
+    assert _even_allocation(256, 3) == [85, 85, 86]
+    assert _even_allocation(512, 3) == [170, 170, 172]
+
+    coords = torch.zeros(1, 4, dtype=torch.long)
+    for dim in (64, 128, 256, 512):
+        pe = build_positional_encoding(
+            coords, embed_dim=dim, mode="control", Nv=4
+        )
+        assert pe.shape == (1, dim)
 
 
 def test_pe_rejects_invalid_configuration() -> None:

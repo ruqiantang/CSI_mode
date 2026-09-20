@@ -2,7 +2,13 @@ import pytest
 import torch
 
 from wifo_upa.geometry import build_coords, inverse_token_index, token_index
-from wifo_upa.masks import make_mask, random_mask, spatial_mask
+from wifo_upa.masks import (
+    MaskLayout,
+    make_mask,
+    make_mask_layout,
+    random_mask,
+    spatial_mask,
+)
 
 
 def test_random_mask_contract() -> None:
@@ -61,3 +67,30 @@ def test_row_mask_disabled_for_single_row() -> None:
 def test_make_mask_rejects_unknown_type() -> None:
     with pytest.raises(ValueError):
         make_mask((1, 1, 1, 1, 1), "unknown", ratio=0.1)
+
+
+def test_mask_layout_derives_shared_token_indices() -> None:
+    torch.manual_seed(12)
+    shape = (3, 2, 2, 2, 2)
+    layout = make_mask_layout(shape, "random", ratio=0.5)
+
+    assert isinstance(layout, MaskLayout)
+    assert layout.shape == shape
+    assert layout.num_tokens == 16
+    assert layout.num_visible_tokens == 8
+    assert layout.visible_ids.numel() == 8
+    assert layout.masked_ids.numel() == 8
+    assert torch.equal(layout.visible_mask, ~layout.mask)
+    assert set(layout.visible_ids.tolist()).isdisjoint(layout.masked_ids.tolist())
+
+
+def test_mask_layout_rejects_nonshared_mask() -> None:
+    coords = torch.zeros(4, 4, dtype=torch.long)
+    mask = torch.tensor(
+        [
+            [True, False, False, False],
+            [False, True, False, False],
+        ]
+    )
+    with pytest.raises(ValueError):
+        MaskLayout.from_mask(mask, coords, (2, 1, 1, 1, 2))

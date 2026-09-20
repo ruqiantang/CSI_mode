@@ -10,8 +10,14 @@ from torch import nn
 from .attention import GeometryAwareBlock, UPARelativePositionBias
 from .config import ModelConfig
 from .embed import AntennaIndependentPatchEmbed
-from .geometry import build_coords, patchify_tf, unpatchify_tf
-from .masks import make_mask
+from .geometry import (
+    build_coords,
+    flatten_token_patches,
+    patchify_tf,
+    unflatten_token_patches,
+    unpatchify_tf,
+)
+from .masks import MaskLayout, make_mask
 from .pe import build_positional_encoding
 
 
@@ -148,43 +154,63 @@ class UPAMAE(nn.Module):
         mask = make_mask(
             (B, Tp, Kp, Nh, Nv), mask_type, ratio, spatial_type
         ).to(H.device)
+        layout = MaskLayout.from_mask(
+            mask=mask,
+            coords=coords,
+            shape=(B, Tp, Kp, Nh, Nv),
+        )
         if not mask.any():
             raise ValueError("mask must contain at least one masked token")
 
         tokens = tokens + self._pe(coords, Nv)
-        visible_mask = ~mask
-        visible_ids = visible_mask[0].nonzero(as_tuple=False).squeeze(1)
-        masked_ids = mask[0].nonzero(as_tuple=False).squeeze(1)
-        visible_tokens = tokens[:, visible_ids, :]
-        visible_coords = coords[visible_ids]
+        visible_tokens = tokens[:, layout.visible_ids, :]
+        visible_coords = coords[layout.visible_ids]
 
         encoded = visible_tokens
         for block in self.encoder:
             encoded = block(encoded, visible_coords)
         encoded = self.norm(encoded)
+        # MAE token restoration uses in-place indexed writes. Keep the decoder
+        # in float32 so AMP encoders do not create mixed destination dtypes.
+        encoded = encoded.float()
 
-        decoded_width = self.config.decoder_embed_dim
-        decoded = torch.zeros(
-            B, L, decoded_width, dtype=encoded.dtype, device=encoded.device
+        with torch.autocast(device_type=H.device.type, enabled=False):
+            decoded_width = self.config.decoder_embed_dim
+            decoded = torch.zeros(
+                B, L, decoded_width, dtype=encoded.dtype, device=encoded.device
+            )
+            decoded[:, layout.visible_ids, :] = self.decoder_embed(encoded)
+            decoded[:, layout.masked_ids, :] = self.mask_token.to(decoded.dtype)
+            decoded = decoded + self._decoder_pe(coords, Nv)
+
+            for block in self.decoder:
+                decoded = block(decoded, coords)
+            decoded = self.decoder_norm(decoded)
+            prediction = self.pred(decoded)
+
+        target = flatten_token_patches(
+            patchify_tf(x, self.config.pt, self.config.pf)
         )
-        decoded[:, visible_ids, :] = self.decoder_embed(encoded)
-        decoded[:, masked_ids, :] = self.mask_token.to(decoded.dtype)
-        decoded = decoded + self._decoder_pe(coords, Nv)
-
-        for block in self.decoder:
-            decoded = block(decoded, coords)
-        decoded = self.decoder_norm(decoded)
-        prediction = self.pred(decoded)
-
-        target = patchify_tf(x, self.config.pt, self.config.pf)
         loss = (
-            (prediction[:, masked_ids, :] - target[:, masked_ids, :]) ** 2
+            (
+                prediction[:, layout.masked_ids, :]
+                - target[:, layout.masked_ids, :]
+            )
+            ** 2
         ).mean()
         if not torch.isfinite(loss):
             raise RuntimeError("non-finite masked reconstruction loss")
 
         reconstructed = unpatchify_tf(
-            prediction,
+            unflatten_token_patches(
+                prediction,
+                T,
+                K,
+                Nh,
+                Nv,
+                self.config.pt,
+                self.config.pf,
+            ),
             T,
             K,
             Nh,
@@ -198,8 +224,8 @@ class UPAMAE(nn.Module):
             "prediction": prediction_complex,
             "loss": loss,
             "mask": mask,
-            "visible_mask": visible_mask,
+            "visible_mask": layout.visible_mask,
             "coords": coords,
             "num_tokens": L,
-            "num_visible_tokens": int(visible_mask[0].sum().item()),
+            "num_visible_tokens": layout.num_visible_tokens,
         }

@@ -7,6 +7,7 @@ coordinates remain shared across the batch dimension.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Tuple
 
 import torch
@@ -14,6 +15,50 @@ import torch
 from .geometry import build_coords
 
 MaskShape = Tuple[int, int, int, int, int]
+
+
+@dataclass(frozen=True)
+class MaskLayout:
+    """Batch-shared token layout derived from a uniform mask."""
+
+    shape: MaskShape
+    coords: torch.Tensor
+    mask: torch.Tensor
+    visible_mask: torch.Tensor
+    visible_ids: torch.Tensor
+    masked_ids: torch.Tensor
+    num_tokens: int
+    num_visible_tokens: int
+
+    @classmethod
+    def from_mask(
+        cls,
+        mask: torch.Tensor,
+        coords: torch.Tensor,
+        shape: MaskShape,
+    ) -> "MaskLayout":
+        B, Tp, Kp, Nh, Nv = shape
+        L = Tp * Kp * Nh * Nv
+        if mask.shape != (B, L) or mask.dtype != torch.bool:
+            raise ValueError(f"expected BoolTensor mask [B,L]={(B, L)}")
+        if not torch.equal(mask, mask[:1].expand(B, L)):
+            raise ValueError("V1 MaskLayout requires a batch-shared mask")
+        if coords.shape != (L, 4) or coords.device != mask.device:
+            raise ValueError("coords must be [L,4] on the mask device")
+
+        visible_mask = ~mask
+        visible_ids = visible_mask[0].nonzero(as_tuple=False).squeeze(1)
+        masked_ids = mask[0].nonzero(as_tuple=False).squeeze(1)
+        return cls(
+            shape=shape,
+            coords=coords,
+            mask=mask,
+            visible_mask=visible_mask,
+            visible_ids=visible_ids,
+            masked_ids=masked_ids,
+            num_tokens=L,
+            num_visible_tokens=int(visible_mask[0].sum().item()),
+        )
 
 
 def _validate_shape(shape: MaskShape) -> None:
@@ -185,3 +230,16 @@ def make_mask(
         f"unknown mask_type {mask_type!r}; expected random, temporal, "
         "frequency, or spatial"
     )
+
+
+def make_mask_layout(
+    shape: MaskShape,
+    mask_type: str,
+    ratio: float,
+    spatial_type: str = "antenna",
+) -> MaskLayout:
+    """Generate a mask and derive its batch-shared token layout."""
+    B, Tp, Kp, Nh, Nv = shape
+    coords = build_coords(Tp, Kp, Nh, Nv)
+    mask = make_mask(shape, mask_type, ratio, spatial_type)
+    return MaskLayout.from_mask(mask=mask, coords=coords, shape=shape)

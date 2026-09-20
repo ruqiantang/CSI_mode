@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 import random
+import time
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping
 
@@ -11,7 +12,14 @@ import torch
 from torch import nn
 from torch.optim import AdamW
 
-from .evaluate import masked_nmse
+from .baseline import WiFoLikeBaseline, baseline_masked_nmse
+from .evaluate import (
+    estimate_model_flops,
+    masked_nmse,
+    nmse_full,
+    parameter_count,
+    peak_memory_bytes,
+)
 from .model import UPAMAE
 
 DEFAULT_RATIOS = {
@@ -31,6 +39,7 @@ class Trainer:
         task_schedule: str = "sample",
         ratios: Mapping[str, float] | None = None,
         grad_clip: float | None = 1.0,
+        use_amp: bool = False,
         device: torch.device | str | None = None,
     ) -> None:
         if task_schedule not in ("sample", "sequential"):
@@ -39,10 +48,14 @@ class Trainer:
         self.task_schedule = task_schedule
         self.ratios = dict(DEFAULT_RATIOS if ratios is None else ratios)
         self.grad_clip = grad_clip
+        self.use_amp = use_amp
         self.device = torch.device(device) if device is not None else torch.device(
             "cuda" if torch.cuda.is_available() else "cpu"
         )
         self.model.to(self.device)
+        self.scaler = torch.amp.GradScaler(
+            "cuda", enabled=self.use_amp and self.device.type == "cuda"
+        )
         self.optimizer = AdamW(
             self.model.parameters(), lr=lr, weight_decay=weight_decay
         )
@@ -59,8 +72,20 @@ class Trainer:
     def _choose_task(self) -> str:
         return random.choice(self.available_tasks())
 
-    def _sample_spatial_type(self) -> str:
-        return random.choice(self.model.config.spatial_types)
+    def _sample_spatial_type(self, H: torch.Tensor) -> str:
+        strategies = list(self.model.config.spatial_types)
+        if H.shape[3] == 1 and "row" in strategies:
+            strategies.remove("row")
+        if H.shape[4] == 1 and "column" in strategies:
+            strategies.remove("column")
+        return random.choice(strategies)
+
+    def _autocast_context(self):
+        if not self.use_amp:
+            return torch.autocast("cpu", enabled=False)
+        if self.device.type == "cuda":
+            return torch.autocast("cuda", dtype=torch.float16)
+        return torch.autocast("cpu", dtype=torch.bfloat16)
 
     def _next_eval_task(self) -> str:
         tasks = self.available_tasks()
@@ -75,14 +100,15 @@ class Trainer:
         training: bool,
     ) -> Dict[str, Any]:
         ratio = self.ratios[task]
-        spatial_type = self._sample_spatial_type()
+        spatial_type = self._sample_spatial_type(H)
         with torch.set_grad_enabled(training):
-            output = self.model(
-                H,
-                mask_type=task,
-                ratio=ratio,
-                spatial_type=spatial_type,
-            )
+            with self._autocast_context():
+                output = self.model(
+                    H,
+                    mask_type=task,
+                    ratio=ratio,
+                    spatial_type=spatial_type,
+                )
         return output
 
     def train_epoch(
@@ -92,7 +118,9 @@ class Trainer:
     ) -> Dict[str, float]:
         self.model.train()
         total_loss = 0.0
+        total_flops = 0
         batches = 0
+        start_time = time.perf_counter()
         for batch in loader:
             H = batch[0] if isinstance(batch, (tuple, list)) else batch
             if not isinstance(H, torch.Tensor):
@@ -106,31 +134,62 @@ class Trainer:
                 if self.task_schedule == "sample"
                 else self.available_tasks()
             )
-            losses = []
+            outputs = []
             self.optimizer.zero_grad(set_to_none=True)
             for task in tasks:
                 output = self._run_one(H, task, True)
-                loss = output["loss"] / len(tasks)
-                loss.backward()
-                losses.append(float(output["loss"].detach().cpu()))
+                outputs.append(output)
+
+            total_loss_value = sum(output["loss"] for output in outputs) / len(
+                outputs
+            )
+            if self.scaler.is_enabled():
+                self.scaler.scale(total_loss_value).backward()
+                self.scaler.unscale_(self.optimizer)
+            else:
+                total_loss_value.backward()
 
             if self.grad_clip is not None:
                 nn.utils.clip_grad_norm_(
                     self.model.parameters(), self.grad_clip
                 )
-            self.optimizer.step()
+            if self.scaler.is_enabled():
+                self.scaler.step(self.optimizer)
+                self.scaler.update()
+            else:
+                self.optimizer.step()
             if self.scheduler is not None:
                 self.scheduler.step()
 
-            batch_loss = sum(losses) / len(losses)
+            batch_loss = float(total_loss_value.detach().cpu())
             if not math.isfinite(batch_loss):
                 raise RuntimeError(f"non-finite loss at epoch {epoch}: {batch_loss}")
             total_loss += batch_loss
+            B, T, K, Nh, Nv = H.shape
+            total_flops += estimate_model_flops(
+                self.model.config,
+                T,
+                K,
+                Nh,
+                Nv,
+                batch_size=B,
+                visible_ratio=(
+                    outputs[0]["num_visible_tokens"]
+                    / outputs[0]["num_tokens"]
+                ),
+            ) * len(outputs)
             batches += 1
 
         if batches == 0:
             raise ValueError("training loader yielded no batches")
-        return {"loss": total_loss / batches, "batches": float(batches)}
+        return {
+            "loss": total_loss / batches,
+            "batches": float(batches),
+            "train_time_seconds": time.perf_counter() - start_time,
+            "estimated_forward_flops": float(total_flops),
+            "parameter_count": float(parameter_count(self.model)),
+            "peak_memory_bytes": float(peak_memory_bytes(self.device)),
+        }
 
     @torch.no_grad()
     def evaluate(
@@ -139,23 +198,61 @@ class Trainer:
     ) -> Dict[str, float]:
         self.model.eval()
         values = []
+        full_values = []
+        total_flops = 0
+        start_time = time.perf_counter()
+        if self.device.type == "cuda":
+            torch.cuda.reset_peak_memory_stats(self.device)
         for batch in loader:
             H = batch[0] if isinstance(batch, (tuple, list)) else batch
             H = H.to(self.device)
             task = self._next_eval_task()
             output = self._run_one(H, task, False)
-            values.append(
-                masked_nmse(
-                    H,
-                    output["prediction"],
-                    output["mask"],
-                    self.model.config.pt,
-                    self.model.config.pf,
+            if isinstance(self.model, WiFoLikeBaseline):
+                values.append(
+                    baseline_masked_nmse(
+                        H,
+                        output["prediction"],
+                        output["mask"],
+                        self.model.config.pt,
+                        self.model.config.pf,
+                    )
                 )
+            else:
+                values.append(
+                    masked_nmse(
+                        H,
+                        output["prediction"],
+                        output["mask"],
+                        self.model.config.pt,
+                        self.model.config.pf,
+                    )
+                )
+            full_values.append(
+                nmse_full(H, output["prediction"])
+            )
+            B, T, K, Nh, Nv = H.shape
+            total_flops += estimate_model_flops(
+                self.model.config,
+                T,
+                K,
+                Nh,
+                Nv,
+                batch_size=B,
+                visible_ratio=(
+                    output["num_visible_tokens"] / output["num_tokens"]
+                ),
             )
         if not values:
             raise ValueError("evaluation loader yielded no batches")
-        return {"nmse": sum(values) / len(values)}
+        return {
+            "nmse": sum(values) / len(values),
+            "nmse_full": sum(full_values) / len(full_values),
+            "inference_time_seconds": time.perf_counter() - start_time,
+            "estimated_forward_flops": float(total_flops),
+            "parameter_count": float(parameter_count(self.model)),
+            "peak_memory_bytes": float(peak_memory_bytes(self.device)),
+        }
 
     def make_scheduler(
         self,

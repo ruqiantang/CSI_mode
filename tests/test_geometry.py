@@ -3,6 +3,7 @@ import torch
 
 from wifo_upa.geometry import (
     build_coords,
+    flatten_token_patches,
     inverse_token_index,
     patchify_tf,
     reshape_upa,
@@ -62,7 +63,9 @@ def test_patchify_and_unpatchify_roundtrip() -> None:
     torch.manual_seed(0)
     x = torch.randn(2, 2, 8, 8, 2, 3)
     patch = patchify_tf(x, pt=4, pf=4)
-    assert patch.shape == (2, 2 * 2 * 2 * 3, 2 * 4 * 4)
+    assert patch.shape == (2, 2, 2, 2, 3, 2, 4, 4)
+    flat = flatten_token_patches(patch)
+    assert flat.shape == (2, 2 * 2 * 2 * 3, 2 * 4 * 4)
     restored = unpatchify_tf(patch, 8, 8, 2, 3, 4, 4)
     assert torch.equal(restored, x)
 

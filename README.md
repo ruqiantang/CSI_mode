@@ -1,6 +1,6 @@
 # WiFo UPA Spatial Extension
 
-This private research project evaluates and documents an extension of WiFo for
+This research project evaluates and documents an extension of WiFo for
 UPA-aware CSI prediction and partial-array reconstruction.
 
 ## Current Finding
@@ -39,8 +39,8 @@ The proposed model is feasible as a first research prototype:
   4D/control positional encodings, structured masks, UPA relative bias,
   training, evaluation, and the WiFo-like baseline.
 - `configs/`: base, Small, Little, and frozen A/B/C/D/Full ablation variants.
-- `tests/`: geometry, embedding, PE, mask, attention, model, training-loop,
-  and D1-D19 dataset-shape contracts.
+- `tests/`: geometry, embedding, PE, mask, attention, model, baseline,
+  evaluation, training-loop, and D1-D19 dataset-shape contracts.
 - `scripts/`: ablation and dataset download entry points.
 - `docs/model-spec.md`: complete tensor, token, positional-encoding, bias,
   masking, decoder, and loss specification.
@@ -52,6 +52,10 @@ The proposed model is feasible as a first research prototype:
   and pretrained weights.
 - `docs/implementation-plan-v1.md`: frozen v1 repository layout, APIs,
   ablation variants, development order, and acceptance criteria.
+- `docs/tensor-contract.md`: frozen complex CSI, token, patch, mask, PE, and
+  metric contracts.
+- `docs/verification.md`: current automated, real-data, AMP, and unverified
+  platform status.
 
 ## Quick Verification
 
@@ -70,5 +74,5 @@ simulation datasets, TensorBoard logs, or model checkpoints. The official source
 audit is based on repository commit
 `a0889e124aeb9dcc423fc37e6796f77c7c4f7f24`.
 
-The GitHub repository is intended to remain private until the research result
-and publication plan are settled. No open-source license is added for now.
+The repository is public, but no open-source license is added while the
+research result and publication plan are being settled.
