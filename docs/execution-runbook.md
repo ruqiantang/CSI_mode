@@ -118,7 +118,34 @@ After extracting the archive, run mixed-dataset training with:
 
 ```bash
 .venv/bin/python scripts/pretrain.py \
-  --config configs/small.yaml \
+  --config configs/wifo_base.yaml --model-type baseline \
+  --data D1=data/D1/X_train.mat \
+  --data D2=data/D2/X_train.mat \
+  --data D3=data/D3/X_train.mat \
+  --data D4=data/D4/X_train.mat \
+  --data D5=data/D5/X_train.mat \
+  --data D6=data/D6/X_train.mat \
+  --data D7=data/D7/X_train.mat \
+  --data D8=data/D8/X_train.mat \
+  --data D9=data/D9/X_train.mat \
+  --data D10=data/D10/X_train.mat \
+  --data D11=data/D11/X_train.mat \
+  --data D12=data/D12/X_train.mat \
+  --data D13=data/D13/X_train.mat \
+  --data D14=data/D14/X_train.mat \
+  --data D15=data/D15/X_train.mat \
+  --data D16=data/D16/X_train.mat \
+  --batch-size 128 --epochs 200 --warmup-epochs 5 \
+  --task-schedule sequential --device cuda --amp \
+  --checkpoint checkpoints/wifo_base_d1_d16.pt
+```
+
+Then train the UPA-aware model with the same data, optimizer, schedule, and
+seed by changing only the model type and configuration:
+
+```bash
+.venv/bin/python scripts/pretrain.py \
+  --config configs/base.yaml --model-type upa \
   --data D1=data/D1/X_train.mat \
   --data D2=data/D2/X_train.mat \
   --data D3=data/D3/X_train.mat \

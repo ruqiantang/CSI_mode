@@ -11,6 +11,7 @@ from typing import List, Sequence, Tuple
 import torch
 from torch.utils.data import DataLoader
 
+from wifo_upa.baseline import WiFoLikeBaseline
 from wifo_upa.config import ModelConfig
 from wifo_upa.data import (
     DATASET_SHAPES,
@@ -27,6 +28,9 @@ DataSpec = Tuple[str, Path]
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, required=True)
+    parser.add_argument(
+        "--model-type", choices=("upa", "baseline"), default="upa"
+    )
     parser.add_argument(
         "--data",
         action="append",
@@ -106,7 +110,11 @@ def main() -> None:
     dataset = make_dataset(train_specs, args.samples_per_dataset)
     sampler = ShapeBucketBatchSampler(dataset, args.batch_size)
     config = ModelConfig.from_yaml(args.config)
-    model = UPAMAE(config)
+    model = (
+        WiFoLikeBaseline(config)
+        if args.model_type == "baseline"
+        else UPAMAE(config)
+    )
     trainer = Trainer(
         model,
         lr=args.lr,
@@ -148,7 +156,7 @@ def main() -> None:
                 epoch=epoch + 1,
                 extra={
                     "config": config.to_dict(),
-                    "model_type": "upa",
+                    "model_type": args.model_type,
                     "train_data": [[dataset, str(path)] for dataset, path in train_specs],
                     "samples_per_dataset": args.samples_per_dataset,
                 },
