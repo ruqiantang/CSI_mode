@@ -124,6 +124,12 @@ num_visible_tokens
 The encoder consumes only `visible_ids`; the decoder restores the complete
 token sequence using `coords`.
 
+Batch sharing is an intentional V1 simplification, not an oversight. It gives
+every sample in a batch the same visible coordinate set, which keeps the
+encoder layout dense and avoids padded or packed variable-length sequences.
+Per-sample masks would require explicit packed layout metadata and per-sample
+attention masks; that is deferred to a later version.
+
 ## Positional Encoding
 
 The 4D PE uses:
@@ -161,3 +167,8 @@ Every training and evaluation report records:
 The FLOPs estimate doubles multiply-accumulate operations and excludes I/O,
 Python overhead, loss reduction, and checkpointing. CPU peak memory is reported
 as zero rather than using a platform-dependent process RSS estimate.
+
+The UPA estimator uses `L=Tp*Kp*Nh*Nv`. The flattened-antenna WiFo baseline
+uses its own estimator and token count `L=Tp*Kp*(Nh*Nv/4)`. In sequential
+training, FLOPs are accumulated separately for each task using that task's
+visible-token ratio.

@@ -2,7 +2,12 @@ import pytest
 import torch
 
 from wifo_upa.config import ModelConfig
-from wifo_upa.evaluate import estimate_model_flops, nmse_full, parameter_count
+from wifo_upa.evaluate import (
+    estimate_baseline_flops,
+    estimate_model_flops,
+    nmse_full,
+    parameter_count,
+)
 from wifo_upa.model import UPAMAE
 
 
@@ -50,3 +55,19 @@ def test_estimate_model_flops_is_positive_and_validated() -> None:
     assert flops > 0
     with pytest.raises(ValueError):
         estimate_model_flops(tiny_config(), T=8, K=8, Nh=2, Nv=2, visible_ratio=0)
+
+
+def test_baseline_flops_use_flattened_antenna_token_count() -> None:
+    config = tiny_config()
+    baseline = estimate_baseline_flops(
+        config, T=8, K=8, Nh=2, Nv=2, visible_ratio=0.5
+    )
+    upa = estimate_model_flops(
+        config, T=8, K=8, Nh=2, Nv=2, visible_ratio=0.5
+    )
+    assert baseline > 0
+    assert baseline < upa
+    with pytest.raises(ValueError):
+        estimate_baseline_flops(
+            config, T=8, K=8, Nh=1, Nv=2, visible_ratio=0.5
+        )

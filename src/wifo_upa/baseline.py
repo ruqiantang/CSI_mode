@@ -172,7 +172,9 @@ class WiFoLikeBaseline(nn.Module):
             raise ValueError("N must be divisible by 4")
         Tp, Kp, Np = T // self.config.pt, K // self.config.pf, N // 4
         L = Tp * Kp * Np
-        x = torch.stack((H.real, H.imag), dim=1)
+        x = torch.stack((H.real, H.imag), dim=1).to(
+            self.embed.proj.weight.dtype
+        )
         tokens = self.embed(x)
         coords = self._coords(Tp, Kp, Np).to(H.device)
         tokens = tokens + self._pe(coords, self.config.embed_dim)

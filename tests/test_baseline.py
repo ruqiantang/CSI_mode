@@ -46,6 +46,18 @@ def test_baseline_forward_output_contract_and_backward() -> None:
     assert torch.isfinite(model.embed.proj.weight.grad).all()
 
 
+def test_baseline_accepts_matlab_style_complex128_input() -> None:
+    model = tiny_baseline()
+    H = tiny_complex_csi().to(torch.complex128)
+    output = model(H, mask_type="random", ratio=0.5)
+
+    assert output["prediction"].shape == H.shape
+    assert torch.isfinite(output["loss"])
+    output["loss"].backward()
+    assert model.embed.proj.weight.grad is not None
+    assert torch.isfinite(model.embed.proj.weight.grad).all()
+
+
 def test_baseline_uses_flattened_antenna_convolution() -> None:
     model = tiny_baseline()
     assert model.embed.proj.kernel_size == (4, 4, 4)

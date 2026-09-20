@@ -92,13 +92,14 @@ def main() -> None:
         print(
             f"epoch={epoch + 1} loss={metrics['loss']:.6f} "
             f"params={int(metrics['parameter_count'])} "
-            f"time={metrics['train_time_seconds']:.3f}s"
+            f"time={metrics['train_time_seconds']:.3f}s "
+            f"train_flops={int(metrics['estimated_forward_flops'])}"
         )
         evaluation = trainer.evaluate(loader)
         print(
             f"eval nmse={evaluation['nmse']:.6f} "
             f"nmse_full={evaluation['nmse_full']:.6f} "
-            f"flops={int(evaluation['estimated_forward_flops'])}"
+            f"eval_flops={int(evaluation['estimated_forward_flops'])}"
         )
 
 

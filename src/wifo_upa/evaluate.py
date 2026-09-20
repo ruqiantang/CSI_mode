@@ -120,3 +120,44 @@ def estimate_model_flops(
     macs += L * D * config.decoder_embed_dim
     macs += L * config.decoder_embed_dim * patch_values
     return int(2 * macs * batch_size)
+
+
+def estimate_baseline_flops(
+    config: ModelConfig,
+    T: int,
+    K: int,
+    Nh: int,
+    Nv: int,
+    batch_size: int = 1,
+    visible_ratio: float = 0.15,
+) -> int:
+    """Estimate forward FLOPs for the flattened-antenna WiFo baseline."""
+    if T % config.pt or K % config.pf:
+        raise ValueError("T and K must be divisible by the frozen patch sizes")
+    if (Nh * Nv) % 4:
+        raise ValueError("WiFo baseline requires Nh*Nv divisible by 4")
+    if not (0.0 < visible_ratio < 1.0) or batch_size <= 0:
+        raise ValueError("batch_size must be positive and 0 < visible_ratio < 1")
+
+    Tp, Kp = T // config.pt, K // config.pf
+    Np = (Nh * Nv) // 4
+    L = Tp * Kp * Np
+    Lvis = max(1, int(round(L * visible_ratio)))
+    D = config.embed_dim
+    patch_values = 2 * config.pt * config.pf * 4
+
+    # Flattened-antenna Conv3d and reconstruction both cover four antennas.
+    macs = L * D * patch_values
+
+    def block_macs(tokens: int, dim: int) -> int:
+        attention = 4 * tokens * dim * dim + 2 * tokens * tokens * dim
+        mlp = 2 * tokens * dim * int(dim * config.mlp_ratio)
+        return attention + mlp
+
+    macs += config.depth * block_macs(Lvis, D)
+    macs += config.decoder_depth * block_macs(
+        L, config.decoder_embed_dim
+    )
+    macs += L * D * config.decoder_embed_dim
+    macs += L * config.decoder_embed_dim * patch_values
+    return int(2 * macs * batch_size)

@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 
 from wifo_upa.config import ModelConfig
 from wifo_upa.data import TensorCSIDataset
+from wifo_upa.evaluate import estimate_model_flops
 from wifo_upa.model import UPAMAE
 from wifo_upa.train import Trainer
 
@@ -46,6 +47,40 @@ def test_train_epoch_runs_all_tasks_and_finite_loss() -> None:
     metrics = trainer.train_epoch(tiny_loader(), epoch=0)
     assert metrics["batches"] == 2
     assert torch.isfinite(torch.tensor(metrics["loss"]))
+
+
+def test_sequential_flops_sum_each_task_visible_ratio() -> None:
+    model = tiny_model()
+    trainer = Trainer(
+        model, task_schedule="sequential", lr=1e-3, device="cpu"
+    )
+    H = torch.complex(
+        torch.randn(2, 8, 8, 2, 2), torch.randn(2, 8, 8, 2, 2)
+    )
+    outputs = [
+        model(
+            H,
+            mask_type=task,
+            ratio=trainer.ratios[task],
+            spatial_type="antenna",
+        )
+        for task in trainer.available_tasks()
+    ]
+    expected = sum(
+        estimate_model_flops(
+            trainer.model.config,
+            *H.shape[1:],
+            batch_size=H.shape[0],
+            visible_ratio=(
+                output["num_visible_tokens"] / output["num_tokens"]
+            ),
+        )
+        for output in outputs
+    )
+    actual = sum(
+        trainer._estimate_output_flops(H, output) for output in outputs
+    )
+    assert actual == expected
 
 
 def test_train_sample_schedule_and_evaluation() -> None:
@@ -90,6 +125,7 @@ def test_scheduler_runs() -> None:
     trainer = Trainer(tiny_model(), task_schedule="sample", device="cpu")
     scheduler = trainer.make_scheduler(total_steps=4, warmup_steps=1)
     for _ in range(4):
+        trainer.optimizer.step()
         scheduler.step()
     assert trainer.scheduler is scheduler
 

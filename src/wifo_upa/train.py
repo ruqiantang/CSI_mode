@@ -15,6 +15,7 @@ from torch.optim import AdamW
 from .baseline import WiFoLikeBaseline, baseline_masked_nmse
 from .evaluate import (
     estimate_model_flops,
+    estimate_baseline_flops,
     masked_nmse,
     nmse_full,
     parameter_count,
@@ -93,6 +94,30 @@ class Trainer:
         self._eval_task_index += 1
         return task
 
+    def _estimate_output_flops(
+        self,
+        H: torch.Tensor,
+        output: Dict[str, Any],
+    ) -> int:
+        B, T, K, Nh, Nv = H.shape
+        visible_ratio = (
+            output["num_visible_tokens"] / output["num_tokens"]
+        )
+        estimator = (
+            estimate_baseline_flops
+            if isinstance(self.model, WiFoLikeBaseline)
+            else estimate_model_flops
+        )
+        return estimator(
+            self.model.config,
+            T,
+            K,
+            Nh,
+            Nv,
+            batch_size=B,
+            visible_ratio=visible_ratio,
+        )
+
     def _run_one(
         self,
         H: torch.Tensor,
@@ -165,19 +190,9 @@ class Trainer:
             if not math.isfinite(batch_loss):
                 raise RuntimeError(f"non-finite loss at epoch {epoch}: {batch_loss}")
             total_loss += batch_loss
-            B, T, K, Nh, Nv = H.shape
-            total_flops += estimate_model_flops(
-                self.model.config,
-                T,
-                K,
-                Nh,
-                Nv,
-                batch_size=B,
-                visible_ratio=(
-                    outputs[0]["num_visible_tokens"]
-                    / outputs[0]["num_tokens"]
-                ),
-            ) * len(outputs)
+            total_flops += sum(
+                self._estimate_output_flops(H, output) for output in outputs
+            )
             batches += 1
 
         if batches == 0:
@@ -231,18 +246,7 @@ class Trainer:
             full_values.append(
                 nmse_full(H, output["prediction"])
             )
-            B, T, K, Nh, Nv = H.shape
-            total_flops += estimate_model_flops(
-                self.model.config,
-                T,
-                K,
-                Nh,
-                Nv,
-                batch_size=B,
-                visible_ratio=(
-                    output["num_visible_tokens"] / output["num_tokens"]
-                ),
-            )
+            total_flops += self._estimate_output_flops(H, output)
         if not values:
             raise ValueError("evaluation loader yielded no batches")
         return {

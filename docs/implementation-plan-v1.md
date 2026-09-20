@@ -317,6 +317,9 @@ batch. Therefore `L_vis` is a single integer and no padded visible-token layout
 is needed. If per-sample variable mask counts are introduced later, the packed
 encoder layout and `num_visible_tokens` must be redesigned explicitly.
 
+This batch-shared `MaskLayout` is therefore the frozen V1 design decision.
+Per-sample masks and per-sample encoder attention are not part of V1.
+
 Training uses `output["loss"]`; debugging can inspect `coords`, `mask`, and
 `visible_mask`.
 
