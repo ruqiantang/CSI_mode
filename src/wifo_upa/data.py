@@ -299,7 +299,7 @@ def load_mat_csi(path: str | Path, upa_shape: Tuple[int, int]) -> torch.Tensor:
                 f"expected one data variable in {path}, found {candidates}"
             )
         array = _normalise_complex_array(np.asarray(raw[candidates[0]]))
-    except ImportError:
+    except (ImportError, NotImplementedError):
         try:
             import h5py
 

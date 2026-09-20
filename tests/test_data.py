@@ -4,6 +4,8 @@ import numpy as np
 import pytest
 import torch
 import h5py
+import scipy.io
+from scipy.io import savemat
 
 from wifo_upa.data import (
     DATASET_SHAPES,
@@ -105,6 +107,42 @@ def test_shape_bucket_sampler_never_mixes_shapes(tmp_path: Path) -> None:
     for batch in batches:
         shapes = {dataset.sample_shapes[index] for index in batch}
         assert len(shapes) == 1
+
+
+def test_load_mat_csi_reads_v5_and_v73_files(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    B, T, K, N = 2, 3, 4, 5
+    real = np.arange(B * T * K * N, dtype=np.float64).reshape(B, T, K, N)
+    imag = real + 0.25
+    values = real + 1j * imag
+
+    v5_path = tmp_path / "X_test_v5.mat"
+    savemat(v5_path, {"X_val": values})
+    v5 = load_mat_csi(v5_path, (1, N))
+    assert v5.shape == (B, T, K, 1, N)
+    assert v5.dtype == torch.complex128
+    expected = torch.as_tensor(values).reshape(B, T, K, 1, N)
+    assert torch.equal(v5, expected)
+
+    v73_path = tmp_path / "X_test_v73.mat"
+    storage = values.transpose(2, 3, 1, 0)
+    with h5py.File(v73_path, "w") as handle:
+        compound = np.empty(
+            storage.shape, dtype=[("real", "<f8"), ("imag", "<f8")]
+        )
+        compound["real"] = storage.real
+        compound["imag"] = storage.imag
+        handle.create_dataset("X_val", data=compound)
+
+    def raise_not_implemented(_):
+        raise NotImplementedError("Please use HDF reader for matlab v7.3")
+
+    monkeypatch.setattr(scipy.io, "loadmat", raise_not_implemented)
+    v73 = load_mat_csi(v73_path, (1, N))
+    assert v73.shape == (B, T, K, 1, N)
+    assert v73.dtype == torch.complex128
+    assert torch.equal(v73, expected)
 
 
 def test_matlab_v73_structured_complex_array_is_normalised() -> None:

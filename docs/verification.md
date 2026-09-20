@@ -4,7 +4,7 @@ Date: 2026-09-20
 
 ## Automated Verification
 
-- Unit tests: `61 passed`
+- Unit tests: `62 passed`
 - Package smoke test: passed
 - Python compilation: passed
 - CPU AMP training and evaluation: passed
@@ -53,6 +53,24 @@ data using `D1`, two samples, batch size two, and one CPU epoch. This verifies
 the loader-to-baseline dtype conversion path. The UPA and baseline use separate
 FLOPs estimators, and sequential schedules accumulate FLOPs per task with that
 task's visible-token ratio.
+
+## D17-D18 Public Data Smoke Verification
+
+The public D17 and D18 `X_test.mat` files were downloaded from Hugging Face and
+not committed. D17 is a MATLAB v5 file and D18 is a MATLAB v7.3/HDF5 file.
+Both loaded through `load_mat_csi()` as `[1000,T,K,Nh,Nv]` complex tensors with
+finite real and imaginary components.
+
+The following two-sample, one-epoch, CPU runs verify the data-to-model path and
+backward pass. They are not zero-shot performance results because the models are
+newly initialized and not pretrained.
+
+| Dataset | Model | Training loss | Masked NMSE | Full NMSE | Training FLOPs | Evaluation FLOPs |
+|---|---|---:|---:|---:|---:|---:|
+| D17 | Full UPA | 2.004032 | 6.639937 | 6.245722 | 108,529,631,232 | 19,744,604,160 |
+| D18 | Full UPA | 1.977585 | 6.288396 | 6.386303 | 185,140,690,944 | 36,259,676,160 |
+| D17 | WiFo-like baseline | 0.718339 | 1.505134 | 1.511122 | 12,575,490,048 | 3,314,466,816 |
+| D18 | WiFo-like baseline | 0.869146 | 1.426712 | 1.440792 | 20,400,488,448 | 5,401,657,344 |
 
 ## Not Yet Verified
 
