@@ -37,6 +37,30 @@ Follow `https://github.com/PKU-PCNI/WiFo/issues/10` for an updated link. The
 WiFo-2 D17-D19 `.pt` files are not substitutes for the original WiFo D17-D19
 datasets.
 
+### Public-Split Pilot
+
+Because the public repository contains test files only, you can run a
+deterministic train/validation/test split on D17 as a same-distribution pilot:
+
+```bash
+.venv/bin/python scripts/run_public_split_pilot.py \
+  --config configs/pilot_full.yaml \
+  --variant full \
+  --dataset D17 \
+  --mat-path data/D17/X_test.mat \
+  --train-samples 128 \
+  --val-samples 32 \
+  --test-samples 64 \
+  --epochs 5 \
+  --batch-size 2 \
+  --warmup-epochs 1 \
+  --output experiments/pilot_d17_full_128_32_64_e5.json
+```
+
+Repeat with `--config configs/pilot_wifo.yaml --variant wifo` for the baseline.
+See `docs/public-split-pilot.md` for the current result and its limitations.
+This is not a zero-shot evaluation.
+
 ## 3. Train a Pilot and Save a Checkpoint
 
 A small real-data pilot can be trained and saved with:

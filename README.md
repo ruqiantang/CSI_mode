@@ -46,6 +46,8 @@ The proposed model is feasible as a first research prototype:
   checkpoints and shape-safe batches.
 - `scripts/verify_cuda.py`: required CUDA forward/backward and AMP check.
 - `scripts/evaluate_checkpoint.py`: task-specific checkpoint evaluation.
+- `scripts/run_public_split_pilot.py`: deterministic train/validation/test
+  split on the public D17 test file for early same-distribution comparison.
 - `docs/model-spec.md`: complete tensor, token, positional-encoding, bias,
   masking, decoder, and loss specification.
 - `docs/source-audit.md`: comparison of the proposed design against the official
@@ -62,6 +64,8 @@ The proposed model is feasible as a first research prototype:
   platform status.
 - `docs/execution-runbook.md`: CUDA, public-data, checkpoint, zero-shot, and
   formal-training procedures.
+- `docs/public-split-pilot.md`: public-test-only split pilot and its current
+  result.
 
 ## Quick Verification
 
