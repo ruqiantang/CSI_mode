@@ -4,7 +4,7 @@ Date: 2026-09-20
 
 ## Automated Verification
 
-- Unit tests: `59 passed`
+- Unit tests: `61 passed`
 - Package smoke test: passed
 - Python compilation: passed
 - CPU AMP training and evaluation: passed

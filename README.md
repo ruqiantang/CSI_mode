@@ -42,6 +42,8 @@ The proposed model is feasible as a first research prototype:
 - `tests/`: geometry, embedding, PE, mask, attention, model, baseline,
   evaluation, training-loop, and D1-D19 dataset-shape contracts.
 - `scripts/`: ablation and dataset download entry points.
+- `scripts/pretrain.py`: mixed-dataset lazy-HDF5 pretraining with resumable
+  checkpoints and shape-safe batches.
 - `scripts/verify_cuda.py`: required CUDA forward/backward and AMP check.
 - `scripts/evaluate_checkpoint.py`: task-specific checkpoint evaluation.
 - `docs/model-spec.md`: complete tensor, token, positional-encoding, bias,
