@@ -4,7 +4,7 @@ Date: 2026-09-20
 
 ## Automated Verification
 
-- Unit tests: `62 passed`
+- Unit tests: `64 passed`
 - Package smoke test: passed
 - Python compilation: passed
 - CPU AMP training and evaluation: passed
@@ -72,14 +72,31 @@ newly initialized and not pretrained.
 | D17 | WiFo-like baseline | 0.718339 | 1.505134 | 1.511122 | 12,575,490,048 | 3,314,466,816 |
 | D18 | WiFo-like baseline | 0.869146 | 1.426712 | 1.440792 | 20,400,488,448 | 5,401,657,344 |
 
+## Formal D4-to-D17 Pilot
+
+The official D4 `X_train.mat` and `X_val.mat` files and the public D17
+`X_test.mat` file were used for a controlled pilot. The data files were not
+committed. Both models used 512 training samples, 32 validation samples, 64
+held-out D17 test samples, two epochs, batch size two, and seed 17.
+
+| Model | Best D4 validation NMSE | D17 random | D17 temporal | D17 frequency | D17 spatial | Shared average |
+|---|---:|---:|---:|---:|---:|---:|
+| WiFo-like baseline | 0.9971673 | 1.0008496 | 1.0008772 | 1.0007424 | N/A | 1.0008230 |
+| Full UPA | 0.9965379 | 1.0006615 | 1.0007602 | 1.0011936 | 1.0043856 | 1.0008718 |
+
+Full UPA improved D4 validation but was slightly worse on the D17 shared-task
+average. This is not a zero-shot result and is not decision-grade; see
+`docs/formal-pilot.md`.
+
 ## Not Yet Verified
 
 - CUDA forward/backward and CUDA AMP.
 - Formal D1-D16 pretraining and D17-D19 zero-shot performance.
 - Public D19 MATLAB data: the public Hugging Face listing currently provides
   D1-D18 test files only.
-- The official PKU cloud pretraining archive link is currently expired;
-  follow `https://github.com/PKU-PCNI/WiFo/issues/10`.
+- The official PKU cloud D1-D16 archive is available, but all 16 formal
+  training datasets have not yet been downloaded and a mixed-dataset pretraining
+  run has not yet been executed.
 
 ## Reproducibility Entry Points
 

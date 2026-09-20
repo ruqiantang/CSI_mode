@@ -1,7 +1,7 @@
 # Execution Runbook
 
 This runbook separates locally reproducible checks from work that requires an
-external CUDA machine and the official pretraining archive.
+external CUDA machine.
 
 ## 1. CUDA Forward, Backward, and AMP
 
@@ -28,14 +28,13 @@ The public Hugging Face listing contains `X_test.mat` for D1-D18 only:
 ```
 
 The script now skips existing nonempty files and explicitly rejects D19 rather
-than silently requesting a missing URL. D19 must come from the official
-pretraining archive; synthetic D19 tensors are shape-contract tests, not
-zero-shot performance results.
+than silently requesting a missing URL. The original D19 split must be obtained
+separately; synthetic D19 tensors are shape-contract tests, not zero-shot
+performance results.
 
-The current PKU cloud pretraining link in the official README is expired.
-Follow `https://github.com/PKU-PCNI/WiFo/issues/10` for an updated link. The
-WiFo-2 D17-D19 `.pt` files are not substitutes for the original WiFo D17-D19
-datasets.
+The official PKU cloud link is active and contains the D1-D16 formal training
+archive. The WiFo-2 D17-D19 `.pt` files are not substitutes for the original
+WiFo D17-D19 datasets.
 
 ### Public-Split Pilot
 
@@ -94,10 +93,27 @@ schedule recorded in the checkpoint for strict comparisons.
 
 ## 5. Formal Pretraining
 
+Before mixed pretraining, run the single-dataset D4-to-D17 pilot documented in
+`docs/formal-pilot.md`. It verifies the official train/validation loader and
+held-out test path while keeping the CPU runtime tractable:
+
+```bash
+.venv/bin/python scripts/run_formal_pilot.py \
+  --config configs/pilot_full.yaml --variant full \
+  --train-dataset D4 --train-path data/D4/X_train.mat \
+  --val-dataset D4 --val-path data/D4/X_val.mat \
+  --test-dataset D17 --test-path data/D17/X_test.mat \
+  --train-samples 512 --val-samples 32 --test-samples 64 \
+  --epochs 2 --batch-size 2 --warmup-epochs 1 \
+  --output experiments/formal_d4_to_d17_full_512_32_64_e2.json
+```
+
+Repeat with `configs/pilot_wifo.yaml --variant wifo` for the baseline. This is
+a controlled pilot, not the paper's D1-D16 zero-shot protocol.
+
 The formal experiment uses D1-D16 training splits from the official PKU cloud
-archive, then D17-D19 held-out test splits. The official archive was released,
-but its current public link is expired; see `docs/references.md` for the
-access issue.
+archive, then D17-D19 held-out test splits. The official PKU share is active;
+see `docs/references.md` for its link and file-layout notes.
 After extracting the archive, run mixed-dataset training with:
 
 ```bash
@@ -134,8 +150,9 @@ Before the full 200-epoch campaign:
 1. Verify CUDA with Little.
 2. Measure one batch of the largest `4x8`, `T=24`, `K=128` configuration.
 3. Start with `configs/small.yaml`, batch size 8 or 16, and sequential tasks.
-4. Save a checkpoint at least every epoch and evaluate D17-D18 before D19 data
-   is available.
+4. Save a checkpoint at least every epoch and evaluate D17-D18 before D19
+   data is obtained.
 
-The public Hugging Face repository contains test files only. The full training
-archive must be downloaded manually once an updated official link is available.
+The public Hugging Face repository contains test files only. Use the official
+PKU share for the formal D1-D16 training and validation files. It does not
+currently expose the original WiFo D19 split.

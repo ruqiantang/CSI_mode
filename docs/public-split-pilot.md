@@ -1,16 +1,17 @@
 # Public-Split Pilot
 
-This pilot is a stopgap while the official D1-D16 training archive is
-unavailable. It splits the public D17 `X_test.mat` file into deterministic
-train, validation, and test subsets, then compares the WiFo-like baseline with
-the Full UPA model on the same split.
+This pilot was created as a stopgap while the official D1-D16 training archive
+was believed to be unavailable. It splits the public D17 `X_test.mat` file
+into deterministic train, validation, and test subsets, then compares the
+WiFo-like baseline with the Full UPA model on the same split.
 
 ## Why This Split Exists
 
-The public Hugging Face dataset provides only `X_test.mat` for D1-D18. There
-is no public `X_train.mat` or `X_val.mat`, and D19 is not in that listing.
-The official PKU cloud archive that should contain the training split is
-currently expired.
+The public Hugging Face dataset provides only `X_test.mat` for D1-D18. The
+official PKU cloud archive has since been verified as active and contains
+D1-D16 formal training and validation splits, so use
+`scripts/run_formal_pilot.py` or `scripts/pretrain.py` for new controlled
+experiments. This document preserves the earlier same-distribution pilot.
 
 Because the pilot reuses the public test file, it is **not** the paper's
 zero-shot protocol and must not be reported as a zero-shot result. It is only
@@ -84,6 +85,5 @@ meaningful gain. The absolute NMSE values are all close to `1.0`, which is
 consistent with the model still struggling to reconstruct held-out CSI from a
 small public-test-only split.
 
-For a decision-grade comparison, use the official D1-D16 training data once
-the archive link is restored, then evaluate the saved checkpoint on D17-D18
-with `scripts/evaluate_checkpoint.py`.
+For a decision-grade comparison, use the official D1-D16 training data, then
+evaluate the saved checkpoint on D17-D18 with `scripts/evaluate_checkpoint.py`.

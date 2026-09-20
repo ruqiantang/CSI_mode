@@ -46,14 +46,19 @@ released. The current official link is:
 
 - `https://disk.pku.edu.cn/link/AA003E48DD5EF343C18ACD92ACF3BB8E3E`
 
-As of 2026-09-20, this PKU cloud link returns "This address has expired".
-Access issue:
-`https://github.com/PKU-PCNI/WiFo/issues/10`
+As verified on 2026-09-20, this PKU cloud link is active. Its `dataset4train`
+share contains D1-D16 directories, and each directory contains the formal
+`X_train.mat`, `X_val.mat`, and `X_test.mat` splits. The files are MATLAB
+v7.3/HDF5 archives. Some validation and test files store their sole MATLAB
+variable under a different split name (for example, D4 `X_val.mat` contains
+`X_test`); the loader intentionally reads the sole variable in each file.
 
-The public repository does not include full training splits. The WiFo-2
-dataset contains directories named D17-D19, but its README maps them to QC17,
-QC18, and QC19 from the WiFo-2 paper; they are not the original WiFo D17-D19
-datasets and use `.pt` rather than the original `.mat` format.
+The PKU share does not provide the original WiFo D19 split. D19 must still be
+obtained separately before D19 zero-shot performance is claimed.
+
+The WiFo-2 dataset contains directories named D17-D19, but its README maps
+them to QC17, QC18, and QC19 from the WiFo-2 paper; they are not the original
+WiFo D17-D19 datasets and use `.pt` rather than the original `.mat` format.
 
 ## Related Concepts
 

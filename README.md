@@ -48,6 +48,8 @@ The proposed model is feasible as a first research prototype:
 - `scripts/evaluate_checkpoint.py`: task-specific checkpoint evaluation.
 - `scripts/run_public_split_pilot.py`: deterministic train/validation/test
   split on the public D17 test file for early same-distribution comparison.
+- `scripts/run_formal_pilot.py`: controlled pilot using official
+  train/validation files and a held-out test file.
 - `docs/model-spec.md`: complete tensor, token, positional-encoding, bias,
   masking, decoder, and loss specification.
 - `docs/source-audit.md`: comparison of the proposed design against the official
@@ -66,6 +68,7 @@ The proposed model is feasible as a first research prototype:
   formal-training procedures.
 - `docs/public-split-pilot.md`: public-test-only split pilot and its current
   result.
+- `docs/formal-pilot.md`: official D4 train/validation to held-out D17 pilot.
 
 ## Quick Verification
 

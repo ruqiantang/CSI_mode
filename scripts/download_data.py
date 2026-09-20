@@ -31,7 +31,7 @@ def main() -> None:
         if dataset not in PUBLIC_DATASETS:
             raise ValueError(
                 f"{dataset} is not in the public D1-D18 Hugging Face listing; "
-                "D19 must be obtained from the official pretraining archive"
+                "the original D19 split must be obtained separately"
             )
         destination = args.output / dataset / "X_test.mat"
         destination.parent.mkdir(parents=True, exist_ok=True)
