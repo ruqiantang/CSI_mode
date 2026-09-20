@@ -32,6 +32,11 @@ than silently requesting a missing URL. D19 must come from the official
 pretraining archive; synthetic D19 tensors are shape-contract tests, not
 zero-shot performance results.
 
+The current PKU cloud pretraining link in the official README is expired.
+Follow `https://github.com/PKU-PCNI/WiFo/issues/10` for an updated link. The
+WiFo-2 D17-D19 `.pt` files are not substitutes for the original WiFo D17-D19
+datasets.
+
 ## 3. Train a Pilot and Save a Checkpoint
 
 A small real-data pilot can be trained and saved with:
@@ -66,7 +71,9 @@ schedule recorded in the checkpoint for strict comparisons.
 ## 5. Formal Pretraining
 
 The formal experiment uses D1-D16 training splits from the official PKU cloud
-archive linked in `docs/references.md`, then D17-D19 held-out test splits.
+archive, then D17-D19 held-out test splits. The official archive was released,
+but its current public link is expired; see `docs/references.md` for the
+access issue.
 After extracting the archive, run mixed-dataset training with:
 
 ```bash
@@ -107,6 +114,4 @@ Before the full 200-epoch campaign:
    is available.
 
 The public Hugging Face repository contains test files only. The full training
-archive must be downloaded manually from the official PKU cloud link because
-that service is an interactive web application rather than a stable direct
-download endpoint.
+archive must be downloaded manually once an updated official link is available.

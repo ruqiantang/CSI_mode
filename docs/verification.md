@@ -60,6 +60,8 @@ task's visible-token ratio.
 - Formal D1-D16 pretraining and D17-D19 zero-shot performance.
 - Public D19 MATLAB data: the public Hugging Face listing currently provides
   D1-D18 test files only.
+- The official PKU cloud pretraining archive link is currently expired;
+  follow `https://github.com/PKU-PCNI/WiFo/issues/10`.
 
 ## Reproducibility Entry Points
 
