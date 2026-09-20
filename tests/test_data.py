@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import numpy as np
 import pytest
 import torch
 
@@ -7,6 +8,8 @@ from wifo_upa.data import (
     DATASET_SHAPES,
     SyntheticCSIDataset,
     TensorCSIDataset,
+    _matlab_v73_to_btkn,
+    _normalise_complex_array,
     load_mat_csi,
 )
 from wifo_upa.geometry import token_count
@@ -41,3 +44,26 @@ def test_tensor_dataset_and_missing_mat_errors(tmp_path: Path) -> None:
 
     with pytest.raises(FileNotFoundError):
         load_mat_csi(tmp_path / "missing.mat", (1, 4))
+
+
+def test_matlab_v73_structured_complex_array_is_normalised() -> None:
+    array = np.array(
+        [(1.0, 2.0), (3.0, 4.0)],
+        dtype=[("real", "<f8"), ("imag", "<f8")],
+    )
+    tensor = torch.as_tensor(_normalise_complex_array(array))
+    assert tensor.dtype == torch.complex128
+    assert torch.equal(
+        tensor, torch.tensor([1 + 2j, 3 + 4j], dtype=torch.complex128)
+    )
+
+
+def test_matlab_v73_axis_order_is_reordered_to_btkn() -> None:
+    array = np.arange(2 * 3 * 4 * 5).reshape(4, 5, 3, 2)
+    reordered = _matlab_v73_to_btkn(array)
+    assert reordered.shape == (2, 3, 4, 5)
+    for b in range(2):
+        for t in range(3):
+            for k in range(4):
+                for n in range(5):
+                    assert reordered[b, t, k, n] == array[k, n, t, b]

@@ -11,6 +11,25 @@ import torch
 from torch.utils.data import Dataset
 
 
+def _normalise_complex_array(array: np.ndarray) -> np.ndarray:
+    """Convert MATLAB v7.3 structured complex arrays to NumPy complex."""
+    if array.dtype.names != ("real", "imag"):
+        return array
+    real = np.asarray(array["real"], dtype=np.float64)
+    imag = np.asarray(array["imag"], dtype=np.float64)
+    return real + 1j * imag
+
+
+def _matlab_v73_to_btkn(array: np.ndarray) -> np.ndarray:
+    """Reorder MATLAB v7.3 ``(K,N,T,B)`` storage to ``(B,T,K,N)``."""
+    if array.ndim != 4:
+        raise ValueError(
+            f"expected MATLAB v7.3 data [K,N,T,B], got {tuple(array.shape)}"
+        )
+    return np.transpose(array, (3, 2, 0, 1))
+
+
+
 @dataclass(frozen=True)
 class DatasetShape:
     name: str
@@ -128,7 +147,7 @@ def load_mat_csi(path: str | Path, upa_shape: Tuple[int, int]) -> torch.Tensor:
             raise ValueError(
                 f"expected one data variable in {path}, found {candidates}"
             )
-        array = np.asarray(raw[candidates[0]])
+        array = _normalise_complex_array(np.asarray(raw[candidates[0]]))
     except ImportError:
         try:
             import h5py
@@ -139,7 +158,9 @@ def load_mat_csi(path: str | Path, upa_shape: Tuple[int, int]) -> torch.Tensor:
                     raise ValueError(
                         f"expected one data variable in {path}, found {candidates}"
                     )
-                array = np.asarray(handle[candidates[0]]).T
+                array = _matlab_v73_to_btkn(
+                    _normalise_complex_array(np.asarray(handle[candidates[0]]))
+                )
         except ImportError as exc:
             raise ImportError(
                 "install scipy or h5py to load MATLAB CSI files"
@@ -148,9 +169,9 @@ def load_mat_csi(path: str | Path, upa_shape: Tuple[int, int]) -> torch.Tensor:
     tensor = torch.as_tensor(array)
     if not torch.is_complex(tensor):
         tensor = tensor.to(torch.complex128)
-    if tensor.ndim == 4:
+    if tensor.ndim == 3:
         tensor = tensor.unsqueeze(0)
-    if tensor.ndim != 5:
+    if tensor.ndim != 4:
         raise ValueError(f"expected [B,T,K,N], got {tuple(tensor.shape)}")
     B, T, K, N = tensor.shape
     if N != Nh * Nv:
