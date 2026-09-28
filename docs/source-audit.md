@@ -36,13 +36,13 @@ both locally patched.
 The proposal changes this to:
 
 ```python
-kernel_size = (pt, pf, 1)
-stride = (pt, pf, 1)
+kernel_size = (pt, pf)
+stride = (pt, pf)
 ```
 
-after moving antennas temporarily into the batch dimension. This removes
-cross-antenna convolution from the embedding while preserving shared
-time-frequency feature extraction.
+with a shared `Conv2d` applied after moving antennas temporarily into the batch
+dimension. This removes cross-antenna convolution from the embedding while
+preserving shared time-frequency feature extraction.
 
 ## 3. Patch and Token Count
 

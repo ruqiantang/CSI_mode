@@ -247,6 +247,9 @@ leaves a spatial visible ratio of `24/32 = 0.75`.
 For `Nh=1`, row masking is unavailable and the spatial sampler selects among
 antenna, column, and block. No strategy may mask every antenna. The first
 single-antenna spatial ratio is 25%; the main comparison should also run 50%.
+Only the antenna strategy interprets `ratio` directly. Row, column, and block
+sample a legal mask size and enforce the same spatial visibility invariant;
+they must be reported separately or explicitly described as a mixed spatial task.
 
 The mask API is uniform across all four tasks:
 
@@ -312,6 +315,11 @@ The first version uses only complex MSE on masked tokens:
 ```text
 L_m = sum_m |H[m] - H_hat[m]|^2 / |Omega_m|
 ```
+
+The implementation computes this as the mean over real and imaginary scalar
+components. This is one half of the complex coefficient MSE above, so absolute
+loss values differ by a constant factor of two. NMSE and model comparisons are
+unaffected; papers should state which normalization is used.
 
 The training loop must expose two schedules:
 

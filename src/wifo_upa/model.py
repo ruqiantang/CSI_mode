@@ -17,6 +17,7 @@ from .geometry import (
     unflatten_token_patches,
     unpatchify_tf,
 )
+from .initialization import initialize_model_weights
 from .masks import MaskLayout, make_mask
 from .pe import build_positional_encoding
 
@@ -92,18 +93,7 @@ class UPAMAE(nn.Module):
             config.decoder_embed_dim, 2 * config.pt * config.pf
         )
 
-        self.apply(self._init_weights)
-        nn.init.normal_(self.mask_token, std=0.02)
-
-    @staticmethod
-    def _init_weights(module: nn.Module) -> None:
-        if isinstance(module, nn.Linear):
-            nn.init.xavier_uniform_(module.weight)
-            if module.bias is not None:
-                nn.init.zeros_(module.bias)
-        elif isinstance(module, nn.LayerNorm):
-            nn.init.ones_(module.weight)
-            nn.init.zeros_(module.bias)
+        initialize_model_weights(self, self.mask_token)
 
     def _pe(self, coords: torch.Tensor, Nv: int) -> torch.Tensor:
         return build_positional_encoding(

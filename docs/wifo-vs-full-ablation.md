@@ -25,12 +25,16 @@
 | 优化器 | AdamW，lr=5e-4，weight_decay=0.05，grad_clip=1.0 |
 | 调度器 | cosine，warmup 3 epoch |
 | 任务调度 | sample（每 batch 随机抽一个掩码任务） |
-| 掩码比例 | random 0.85 / temporal 0.50 / frequency 0.50 / spatial 0.25 |
+| 掩码比例 | random 0.85 / temporal 0.50 / frequency 0.50；spatial 中 antenna 目标为 0.25，row/column/block 随机选择合法规模并保持空间可见率 >= 0.5 |
 | 精度 | AMP（fp16） |
 | 随机种子 | 17 |
 | 硬件 | NVIDIA A10 24GB，torch 2.5.1+cu124，Python 3.10.12 |
 
 两个模型的骨干尺寸完全相同：embed 256 / depth 6 / decoder_depth 4 / heads 8 / mlp_ratio 2.0 / pt 4 / pf 4。
+
+Spatial 训练任务是四种策略混合采样；`0.25` 只是 antenna 策略的目标掩码比例，不能表述为所有
+spatial mask 都是 25%。最终报告应分别给出 antenna、row、column、block 的结果，或在训练协议中
+明确说明混合采样。
 
 ## 3. 模型结构差异
 

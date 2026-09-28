@@ -9,6 +9,7 @@ from torch import nn
 
 from .attention import GeometryAwareBlock
 from .config import ModelConfig
+from .initialization import initialize_model_weights
 from .masks import make_mask
 from .pe import _even_allocation, _sincos_1d
 
@@ -137,6 +138,7 @@ class WiFoLikeBaseline(nn.Module):
         )
         self.decoder_norm = nn.LayerNorm(config.decoder_embed_dim)
         self.pred = nn.Linear(config.decoder_embed_dim, 2 * config.pt * config.pf * 4)
+        initialize_model_weights(self, self.mask_token)
 
     def _coords(self, Tp: int, Kp: int, Np: int) -> torch.Tensor:
         t = torch.arange(Tp).repeat_interleave(Kp * Np)
@@ -186,17 +188,26 @@ class WiFoLikeBaseline(nn.Module):
         for block in self.encoder:
             encoded = block(encoded, coords[visible_ids])
         encoded = self.norm(encoded)
+        # Match UPAMAE: decoder restoration and prediction stay in float32
+        # when the encoder runs under AMP.
+        encoded = encoded.float()
 
-        decoded = torch.zeros(
-            B, L, self.config.decoder_embed_dim, device=H.device
-        )
-        decoded[:, visible_ids, :] = self.decoder_embed(encoded)
-        decoded[:, masked_ids, :] = self.mask_token
-        decoded = decoded + self._pe(coords, self.config.decoder_embed_dim)
-        for block in self.decoder:
-            decoded = block(decoded, coords)
-        decoded = self.decoder_norm(decoded)
-        prediction = self.pred(decoded)
+        with torch.autocast(device_type=H.device.type, enabled=False):
+            decoded = torch.zeros(
+                B,
+                L,
+                self.config.decoder_embed_dim,
+                dtype=encoded.dtype,
+                device=encoded.device,
+            )
+            decoded[:, visible_ids, :] = self.decoder_embed(encoded)
+            decoded[:, masked_ids, :] = self.mask_token.to(decoded.dtype)
+            decoded = decoded + self._pe(coords, self.config.decoder_embed_dim)
+
+            for block in self.decoder:
+                decoded = block(decoded, coords)
+            decoded = self.decoder_norm(decoded)
+            prediction = self.pred(decoded)
 
         target = _patchify_wifo(x, self.config.pt, self.config.pf)
         loss = (
