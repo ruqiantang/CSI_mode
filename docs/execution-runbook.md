@@ -75,6 +75,11 @@ A small real-data pilot can be trained and saved with:
 The checkpoint contains the model, optimizer, optional scheduler, task
 schedule, ratios, and model type. Checkpoints are ignored by git.
 
+UPA checkpoints saved before the `Conv2d` embedding reformulation are not
+automatically compatible with the current model. Retrain from a new
+checkpoint rather than loading an old UPA `Conv3d` state dict. WiFo-like
+baseline checkpoints are unaffected.
+
 ## 4. Zero-Shot Task Evaluation
 
 Evaluate a saved checkpoint on each available task:

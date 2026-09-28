@@ -24,9 +24,9 @@ def test_token_index_matches_frozen_formula() -> None:
 
 
 def test_token_index_roundtrip() -> None:
-    Kp, Nh, Nv = 3, 2, 4
-    for length in range(Kp * Nh * Nv):
-        t, k, r, c = inverse_token_index(length, Kp, Nh, Nv)
+    Tp, Kp, Nh, Nv = 3, 2, 2, 4
+    for length in range(Tp * Kp * Nh * Nv):
+        t, k, r, c = inverse_token_index(length, Tp, Kp, Nh, Nv)
         assert token_index(t, k, r, c, Kp, Nh, Nv) == length
 
 
@@ -34,7 +34,7 @@ def test_invalid_token_coordinates_rejected() -> None:
     with pytest.raises(ValueError):
         token_index(0, 3, 0, 0, 3, 2, 4)
     with pytest.raises(ValueError):
-        inverse_token_index(24, 3, 2, 4)
+        inverse_token_index(72, 3, 3, 2, 4)
 
 
 def test_build_coords_uses_cartesian_token_order() -> None:

@@ -104,7 +104,7 @@ def estimate_model_flops(
     D = config.embed_dim
     patch_values = 2 * config.pt * config.pf
 
-    # Shared Conv3d over every antenna.
+    # Shared antenna-independent Conv2d over every antenna.
     macs = L * D * patch_values
 
     def block_macs(tokens: int, dim: int, heads: int) -> int:

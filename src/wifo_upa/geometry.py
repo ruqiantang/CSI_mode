@@ -35,12 +35,19 @@ def token_index(t: int, k: int, r: int, c: int, Kp: int, Nh: int, Nv: int) -> in
     return ((t * Kp + k) * Nh + r) * Nv + c
 
 
-def inverse_token_index(l: int, Kp: int, Nh: int, Nv: int) -> Coord:
+def inverse_token_index(
+    l: int,
+    Tp: int,
+    Kp: int,
+    Nh: int,
+    Nv: int,
+) -> Coord:
     """Invert :func:`token_index` for a valid token id."""
+    _check_positive_int(Tp, "Tp")
     _check_positive_int(Kp, "Kp")
     _check_positive_int(Nh, "Nh")
     _check_positive_int(Nv, "Nv")
-    length = Kp * Nh * Nv
+    length = Tp * Kp * Nh * Nv
     if not isinstance(l, int) or isinstance(l, bool) or not (0 <= l < length):
         raise ValueError(f"token index must satisfy 0 <= l < {length}, got {l!r}")
 

@@ -10,7 +10,7 @@ The proposed model is feasible as a first research prototype:
 - The official WiFo implementation embeds the flattened antenna dimension with a
   `Conv3d` kernel of `(t_patch_size, patch_size, patch_size)`, so both the
   frequency and antenna dimensions are convolved locally.
-- Replacing that with a shared single-antenna time-frequency `Conv3d`,
+- Replacing that with a shared single-antenna time-frequency `Conv2d`,
   followed by a UPA-aware Transformer, is a coherent structural change.
 - The central narrative is **antenna-independent time-frequency embedding plus
   a geometry-aware UPA Transformer**. The change is not merely a new positional

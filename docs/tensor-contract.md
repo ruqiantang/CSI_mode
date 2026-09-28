@@ -54,7 +54,7 @@ l = ((t*Kp+k)*Nh+r)*Nv+c
 The inverse mapping must recover exactly:
 
 ```text
-inverse_token_index(l) = (t,k,r,c)
+inverse_token_index(l,Tp,Kp,Nh,Nv) = (t,k,r,c)
 ```
 
 ## Structured Patching
@@ -89,9 +89,9 @@ The shared TF embedding uses:
 
 ```text
 X: [B,2,T,K,Nh,Nv]
-  -> [B*Nh*Nv,2,T,K,1]
-  -> Conv3d(kernel=(pt,pf,1), stride=(pt,pf,1))
-  -> [B*Nh*Nv,D,Tp,Kp,1]
+  -> [B*Nh*Nv,2,T,K]
+  -> Conv2d(kernel=(pt,pf), stride=(pt,pf))
+  -> [B*Nh*Nv,D,Tp,Kp]
   -> [B,L,D]
 ```
 

@@ -122,7 +122,7 @@ Frozen public functions:
 
 ```python
 token_index(t, k, r, c, Kp, Nh, Nv)
-inverse_token_index(l, Kp, Nh, Nv)
+inverse_token_index(l, Tp, Kp, Nh, Nv)
 build_coords(Tp, Kp, Nh, Nv)
 reshape_upa(x, shape_before, shape_after)
 patchify_tf(x, pt, pf)
@@ -174,9 +174,9 @@ The frozen tensor contract is:
 
 ```text
 [B,2,T,K,Nh,Nv]
-  -> [B*Nh*Nv,2,T,K,1]
-  -> Conv3d(kernel=(pt,pf,1), stride=(pt,pf,1))
-  -> [B*Nh*Nv,D,Tp,Kp,1]
+  -> [B*Nh*Nv,2,T,K]
+  -> Conv2d(kernel=(pt,pf), stride=(pt,pf))
+  -> [B*Nh*Nv,D,Tp,Kp]
   -> [B,Tp,Kp,Nh,Nv,D]
 ```
 

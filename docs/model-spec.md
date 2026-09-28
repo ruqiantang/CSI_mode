@@ -49,22 +49,22 @@ Each antenna is temporarily treated as an independent sample for the shared
 time-frequency embedding:
 
 ```text
-X_a in R^((B*Nh*Nv) x 2 x T x K x 1)
+X_a in R^((B*Nh*Nv) x 2 x T x K)
 ```
 
-The final size-one dimension is retained so that the shared convolution is a
-`Conv3d` with an antenna kernel and stride of one.
+The antenna dimensions are folded into the sample axis, so the shared
+time-frequency projection is a true `Conv2d` and never crosses antennas.
 
 ## 3. Antenna-Independent Embedding
 
 The first model uses:
 
 ```text
-Conv3d(
+Conv2d(
   in_channels=2,
   out_channels=D,
-  kernel_size=(pt, pf, 1),
-  stride=(pt, pf, 1),
+  kernel_size=(pt, pf),
+  stride=(pt, pf),
 )
 ```
 

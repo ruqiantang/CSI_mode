@@ -1,5 +1,8 @@
+from pathlib import Path
+
 import pytest
 import torch
+from torch import nn
 
 from wifo_upa.config import ModelConfig
 from wifo_upa.model import UPAMAE
@@ -106,5 +109,26 @@ def test_ablation_a_uses_control_pe_and_antenna_independent_kernel() -> None:
     config = tiny_config(pe_mode="control", use_upa_bias=False, allow_spatial_mask=False)
     model = UPAMAE(config)
     assert config.pe_mode == "control"
-    assert model.embed.proj.kernel_size == (4, 4, 1)
+    assert isinstance(model.embed.proj, nn.Conv2d)
+    assert model.embed.proj.kernel_size == (4, 4)
     assert model.encoder[0].attn.relative_bias is None
+
+
+@pytest.mark.parametrize(
+    "config_name",
+    [
+        "ablation_a.yaml",
+        "ablation_b.yaml",
+        "ablation_c.yaml",
+        "ablation_d.yaml",
+        "full.yaml",
+    ],
+)
+def test_upa_variants_use_antenna_independent_conv2d(config_name: str) -> None:
+    config_path = Path(__file__).resolve().parents[1] / "configs" / config_name
+    config = ModelConfig.from_yaml(config_path)
+    model = UPAMAE(config)
+
+    assert isinstance(model.embed.proj, nn.Conv2d)
+    assert model.embed.proj.kernel_size == (4, 4)
+    assert model.embed.proj.stride == (4, 4)
