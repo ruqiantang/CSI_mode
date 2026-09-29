@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="180mm" height="64mm" viewBox="0 0 180 64" role="img" aria-labelledby="title desc">
+  <title id="title">Flattened antenna versus explicit UPA representation</title>
+  <desc id="desc">A conceptual contrast between one-dimensional antenna indexing and two-dimensional row-column coordinates.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto">
+      <path d="M0,0 L6,3.5 L0,7 Z" fill="#333333"/>
+    </marker>
+    <marker id="arrow-soft" markerWidth="6" markerHeight="6" refX="4.5" refY="3" orient="auto">
+      <path d="M0,0 L5,3 L0,6 Z" fill="#4b7057"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="180" height="64" fill="#ffffff"/>
+<rect x="1.00" y="1.00" width="86.00" height="52.00" rx="1.1" fill="#f5f8fa" stroke="#555555" stroke-width="0.318"/>
+<rect x="93.00" y="1.00" width="86.00" height="52.00" rx="1.1" fill="#f3f8f4" stroke="#555555" stroke-width="0.318"/>
+<text x="44.00" y="7.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="3.351" font-weight="700" fill="#202529">Flattened Representation</text>
+<text x="44.00" y="12.20" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.999" font-weight="400" fill="#565f68">4 × 8 physical UPA</text>
+<rect x="27.00" y="16.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="31.00" y="16.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="35.00" y="16.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="39.00" y="16.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="43.00" y="16.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="47.00" y="16.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="51.00" y="16.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="55.00" y="16.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="27.00" y="20.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="31.00" y="20.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="35.00" y="20.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="39.00" y="20.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="43.00" y="20.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="47.00" y="20.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="51.00" y="20.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="55.00" y="20.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="27.00" y="24.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="31.00" y="24.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="35.00" y="24.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="39.00" y="24.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="43.00" y="24.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="47.00" y="24.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="51.00" y="24.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="55.00" y="24.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="27.00" y="28.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="31.00" y="28.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="35.00" y="28.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="39.00" y="28.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="43.00" y="28.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="47.00" y="28.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="51.00" y="28.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="55.00" y="28.00" width="4.00" height="4.00" fill="#dce7f0" stroke="#8d99a6" stroke-width="0.180"/>
+<text x="62.50" y="25.00" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="400" fill="#565f68">4 rows × 8 columns</text>
+<line x1="44.00" y1="35.00" x2="44.00" y2="41.00" stroke="#333333" stroke-width="0.388" marker-end="url(#arrow)"/>
+<text x="47.00" y="40.00" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="400" fill="#202529">Flatten</text>
+<text x="44.00" y="46.00" text-anchor="middle" font-family="Times New Roman, Times, serif" font-size="2.999" font-weight="400" fill="#202529" font-style="italic">u = 0, 1, ..., 31</text>
+<text x="44.00" y="51.00" text-anchor="middle" font-family="Times New Roman, Times, serif" font-size="2.999" font-weight="400" fill="#202529" font-style="italic">u = rN_v + c</text>
+<text x="136.00" y="7.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="3.351" font-weight="700" fill="#202529">Explicit UPA Representation</text>
+<text x="136.00" y="12.20" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.999" font-weight="400" fill="#565f68">4 × 8 row-column topology</text>
+<rect x="119.00" y="16.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="123.00" y="16.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="127.00" y="16.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="131.00" y="16.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="135.00" y="16.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="139.00" y="16.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="143.00" y="16.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="147.00" y="16.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="119.00" y="20.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="123.00" y="20.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="127.00" y="20.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="131.00" y="20.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="135.00" y="20.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="139.00" y="20.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="143.00" y="20.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="147.00" y="20.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="119.00" y="24.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="123.00" y="24.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="127.00" y="24.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="131.00" y="24.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="135.00" y="24.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="139.00" y="24.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="143.00" y="24.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="147.00" y="24.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="119.00" y="28.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="123.00" y="28.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="127.00" y="28.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="131.00" y="28.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="135.00" y="28.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="139.00" y="28.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="143.00" y="28.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="147.00" y="28.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="131.00" y="25.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#4b7057" stroke-width="0.250"/>
+<rect x="135.00" y="21.00" width="4.00" height="4.00" fill="#dcebe0" stroke="#4b7057" stroke-width="0.250"/>
+<rect x="135.00" y="25.00" width="4.00" height="4.00" fill="#b8d4c2" stroke="#4b7057" stroke-width="0.300"/>
+<text x="140.50" y="21.00" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="400" fill="#3f5d4a">key</text>
+<text x="126.50" y="29.50" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="400" fill="#3f5d4a">key</text>
+<text x="140.50" y="26.80" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="400" fill="#3f5d4a">query</text>
+<line x1="137.00" y1="27.00" x2="133.00" y2="27.00" stroke="#4b7057" stroke-width="0.282" marker-end="url(#arrow-soft)"/>
+<line x1="137.00" y1="27.00" x2="137.00" y2="23.00" stroke="#4b7057" stroke-width="0.282" marker-end="url(#arrow-soft)"/>
+<text x="129.20" y="24.20" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="400" fill="#4b7057">Δc</text>
+<text x="136.40" y="20.20" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="400" fill="#4b7057">Δr</text>
+<text x="136.00" y="41.00" text-anchor="middle" font-family="Times New Roman, Times, serif" font-size="2.999" font-weight="400" fill="#202529" font-style="italic">(t, k, u) vs. (t, k, r, c)</text>
+<text x="136.00" y="46.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="400" fill="#3f5d4a">r = row, c = column</text>
+<text x="136.00" y="51.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="400" fill="#3f5d4a">Explicit row-column topology</text>
+<text x="44.00" y="60.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="400" fill="#565f68">Row-column topology is not explicitly encoded in the model interface</text>
+<text x="136.00" y="60.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="400" fill="#3f5d4a">UPA geometry is explicitly represented</text>
+</svg>

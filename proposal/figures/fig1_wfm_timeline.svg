@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="180mm" height="51mm" viewBox="0 0 180 51" role="img" aria-labelledby="title desc">
+  <title id="title">Evolution of wireless foundation models</title>
+  <desc id="desc">A three-stage evolution from technical foundations to channel foundation models and specialized physics-aware research.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto">
+      <path d="M0,0 L6,3.5 L0,7 Z" fill="#333333"/>
+    </marker>
+    <marker id="arrow-soft" markerWidth="6" markerHeight="6" refX="4.5" refY="3" orient="auto">
+      <path d="M0,0 L5,3 L0,6 Z" fill="#4b7057"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="180" height="51" fill="#ffffff"/>
+<rect x="1.00" y="3.00" width="38.00" height="47.00" rx="1.1" fill="#f3f6f8" stroke="#555555" stroke-width="0.318"/>
+<text x="20.00" y="9.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="3.528" font-weight="700" fill="#202529">I. 前期技术积累</text>
+<text x="20.00" y="14.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.822" font-weight="400" fill="#565f68">Early Technical Foundations</text>
+<text x="20.00" y="26.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.999" font-weight="400" fill="#202529">Wireless Task Modeling</text>
+<text x="20.00" y="31.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.999" font-weight="400" fill="#202529">Transformer / SSL</text>
+<text x="20.00" y="36.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.999" font-weight="400" fill="#202529">Masked Modeling</text>
+<line x1="39.20" y1="27.50" x2="44.80" y2="27.50" stroke="#333333" stroke-width="0.388" marker-end="url(#arrow)"/>
+<rect x="45.00" y="3.00" width="42.00" height="47.00" rx="1.1" fill="#eaf2f8" stroke="#555555" stroke-width="0.318"/>
+<text x="66.00" y="9.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="3.528" font-weight="700" fill="#202529">II. 基础模型概念形成</text>
+<text x="66.00" y="14.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.822" font-weight="400" fill="#565f68">Foundation Models</text>
+<text x="66.00" y="26.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.999" font-weight="400" fill="#202529">LWM · WiFo</text>
+<text x="66.00" y="31.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.999" font-weight="400" fill="#202529">Large-Scale Pretraining</text>
+<text x="66.00" y="36.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.999" font-weight="400" fill="#202529">Multi-Task Transfer</text>
+<line x1="87.20" y1="27.50" x2="92.80" y2="27.50" stroke="#333333" stroke-width="0.388" marker-end="url(#arrow)"/>
+<rect x="93.00" y="3.00" width="86.00" height="47.00" rx="1.1" fill="#e9f5f4" stroke="#555555" stroke-width="0.318"/>
+<text x="136.00" y="9.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="3.528" font-weight="700" fill="#202529">III. 快速扩展与专门化</text>
+<text x="136.00" y="14.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.822" font-weight="400" fill="#565f68">Expansion &amp; Specialization</text>
+<rect x="95.00" y="18.00" width="26.00" height="24.00" rx="0.8" fill="#ffffff" stroke="#7b8794" stroke-width="0.282"/>
+<text x="108.00" y="22.50" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="3.175" font-weight="700" fill="#202529">Heterogeneity</text>
+<text x="108.00" y="27.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="3.175" font-weight="700" fill="#202529">&amp; Scaling</text>
+<text x="108.00" y="33.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.822" font-weight="400" fill="#202529">Heterogeneous CSI</text>
+<text x="108.00" y="38.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.822" font-weight="400" fill="#202529">Generalization</text>
+<rect x="123.00" y="18.00" width="26.00" height="24.00" rx="0.8" fill="#ffffff" stroke="#7b8794" stroke-width="0.282"/>
+<text x="136.00" y="22.50" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="3.175" font-weight="700" fill="#202529">Efficiency</text>
+<text x="136.00" y="33.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.822" font-weight="400" fill="#202529">Lightweight Models</text>
+<text x="136.00" y="38.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.822" font-weight="400" fill="#202529">Inference Cost</text>
+<rect x="151.00" y="18.00" width="26.00" height="24.00" rx="0.8" fill="#e5f2f1" stroke="#3f7d82" stroke-width="0.282"/>
+<text x="164.00" y="22.50" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="3.175" font-weight="700" fill="#202529">Physics /</text>
+<text x="164.00" y="27.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="3.175" font-weight="700" fill="#202529">Structure</text>
+<text x="164.00" y="33.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.822" font-weight="400" fill="#202529">Physical Coords</text>
+<text x="164.00" y="38.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.822" font-weight="400" fill="#202529">Geometry</text>
+<line x1="164.00" y1="42.00" x2="164.00" y2="43.50" stroke="#3f7d82" stroke-width="0.282" marker-end="url(#arrow-soft)"/>
+<rect x="149.00" y="43.50" width="30.00" height="6.50" rx="1.0" fill="#f3faf7" stroke="#3f7d82" stroke-width="0.247" stroke-dasharray="1.6 1.1"/>
+<text x="164.00" y="45.90" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="700" fill="#285b60">Focus</text>
+<text x="164.00" y="48.50" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="700" fill="#285b60">Explicit 2D UPA</text>
+</svg>

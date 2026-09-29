@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="180mm" height="58mm" viewBox="0 0 180 58" role="img" aria-labelledby="title desc">
+  <title id="title">Two-dimensional UPA relative geometry</title>
+  <desc id="desc">Query-key row and column displacement feeding a separable attention bias.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto">
+      <path d="M0,0 L6,3.5 L0,7 Z" fill="#333333"/>
+    </marker>
+    <marker id="arrow-soft" markerWidth="6" markerHeight="6" refX="4.5" refY="3" orient="auto">
+      <path d="M0,0 L5,3 L0,6 Z" fill="#4b7057"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="180" height="58" fill="#ffffff"/>
+<rect x="1.00" y="1.00" width="86.00" height="50.00" rx="1.1" fill="#f3f8f4" stroke="#555555" stroke-width="0.318"/>
+<rect x="93.00" y="1.00" width="86.00" height="50.00" rx="1.1" fill="#fff7ec" stroke="#555555" stroke-width="0.318"/>
+<text x="44.00" y="7.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="3.351" font-weight="700" fill="#202529">UPA Relative Geometry</text>
+<rect x="20.00" y="13.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="26.00" y="13.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="32.00" y="13.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="38.00" y="13.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="44.00" y="13.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="20.00" y="19.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="26.00" y="19.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="32.00" y="19.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="38.00" y="19.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="44.00" y="19.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="20.00" y="25.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="26.00" y="25.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="32.00" y="25.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="38.00" y="25.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="44.00" y="25.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="20.00" y="31.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="26.00" y="31.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="32.00" y="31.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="38.00" y="31.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="44.00" y="31.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="20.00" y="37.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="26.00" y="37.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="32.00" y="37.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="38.00" y="37.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="44.00" y="37.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#8d99a6" stroke-width="0.180"/>
+<rect x="26.00" y="25.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#4b7057" stroke-width="0.250"/>
+<rect x="32.00" y="19.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#4b7057" stroke-width="0.250"/>
+<rect x="26.00" y="19.00" width="6.00" height="6.00" fill="#dcebe0" stroke="#4b7057" stroke-width="0.250"/>
+<rect x="32.00" y="25.00" width="6.00" height="6.00" fill="#b8d4c2" stroke="#4b7057" stroke-width="0.300"/>
+<text x="35.00" y="28.70" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="700" fill="#3f5d4a">i</text>
+<text x="29.00" y="28.70" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="700" fill="#3f5d4a">j2</text>
+<text x="35.00" y="22.70" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="700" fill="#3f5d4a">j1</text>
+<text x="29.00" y="22.70" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="700" fill="#3f5d4a">j3</text>
+<line x1="36.50" y1="29.50" x2="30.50" y2="29.50" stroke="#4b7057" stroke-width="0.282" marker-end="url(#arrow-soft)"/>
+<line x1="36.50" y1="29.50" x2="36.50" y2="23.50" stroke="#4b7057" stroke-width="0.282" marker-end="url(#arrow-soft)"/>
+<line x1="36.50" y1="29.50" x2="30.50" y2="23.50" stroke="#4b7057" stroke-width="0.282" marker-end="url(#arrow-soft)"/>
+<text x="55.00" y="20.00" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="2.999" font-weight="400" fill="#4b7057">Key j1: (Δr,Δc)=(0,+1)</text>
+<text x="55.00" y="27.00" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="2.999" font-weight="400" fill="#4b7057">Key j2: (Δr,Δc)=(+1,0)</text>
+<text x="55.00" y="34.00" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="2.999" font-weight="400" fill="#4b7057">Key j3: (Δr,Δc)=(+1,+1)</text>
+<text x="44.00" y="45.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.646" font-weight="400" fill="#565f68">Horizontal, vertical, and diagonal relations remain distinguishable</text>
+<text x="136.00" y="7.00" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="3.351" font-weight="700" fill="#202529">Separable Relative Bias</text>
+<rect x="101.00" y="12.00" width="70.00" height="10.00" rx="0.9" fill="#ffffff" stroke="#c7a575" stroke-width="0.282"/>
+<text x="136.00" y="16.50" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.999" font-weight="700" fill="#202529">Relative Displacement</text>
+<text x="136.00" y="20.60" text-anchor="middle" font-family="Times New Roman, Times, serif" font-size="2.999" font-weight="400" fill="#202529" font-style="italic">Δr = r_i - r_j;  Δc = c_i - c_j</text>
+<rect x="101.00" y="26.00" width="70.00" height="10.00" rx="0.9" fill="#ffffff" stroke="#c7a575" stroke-width="0.282"/>
+<text x="136.00" y="30.50" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.999" font-weight="700" fill="#202529">Separable Bias</text>
+<text x="136.00" y="34.60" text-anchor="middle" font-family="Times New Roman, Times, serif" font-size="2.999" font-weight="400" fill="#202529" font-style="italic">B_h(Δr,Δc) = b_r^h(Δr) + b_c^h(Δc)</text>
+<rect x="101.00" y="40.00" width="70.00" height="10.00" rx="0.9" fill="#ffffff" stroke="#c7a575" stroke-width="0.282"/>
+<text x="136.00" y="44.50" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="2.999" font-weight="700" fill="#202529">Attention Score</text>
+<text x="136.00" y="48.60" text-anchor="middle" font-family="Times New Roman, Times, serif" font-size="2.999" font-weight="400" fill="#202529" font-style="italic">QK^T / √d + B_h(Δr,Δc)</text>
+</svg>

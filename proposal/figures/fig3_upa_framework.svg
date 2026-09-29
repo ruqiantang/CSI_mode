@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="179mm" height="68mm" viewBox="0 0 179 68" role="img" aria-labelledby="fig-title fig-desc">
+  <title id="fig-title">Overall framework of the proposed geometry-aware UPA channel foundation model</title>
+  <desc id="fig-desc">Five-column pipeline from input CSI to geometry-aware Transformer and masked reconstruction.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto">
+      <path d="M0,0 L6,3.5 L0,7 Z" fill="#333333"/>
+    </marker>
+    <marker id="arrow-soft" markerWidth="6" markerHeight="6" refX="4.5" refY="3" orient="auto">
+      <path d="M0,0 L5,3 L0,6 Z" fill="#666666"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="179" height="68" fill="#ffffff"/>
+
+  <g transform="translate(1,0)">
+
+  <g stroke="#555555" stroke-width="0.35">
+    <rect x="0" y="0" width="22" height="54" rx="1.2" fill="#f7f9fb"/>
+    <rect x="27" y="0" width="32" height="54" rx="1.2" fill="#f5f8f5"/>
+    <rect x="63" y="0" width="34" height="54" rx="1.2" fill="#fff8ef"/>
+    <rect x="101" y="0" width="34" height="54" rx="1.2" fill="#f5f3f8"/>
+    <rect x="139" y="0" width="38" height="54" rx="1.2" fill="#f9f4f4"/>
+  </g>
+
+  <g stroke="#333333" stroke-width="0.7" marker-end="url(#arrow)">
+    <line x1="23.3" y1="27" x2="26.7" y2="27"/>
+    <line x1="59.3" y1="27" x2="62.7" y2="27"/>
+    <line x1="97.3" y1="27" x2="100.7" y2="27"/>
+    <line x1="135.3" y1="27" x2="138.7" y2="27"/>
+  </g>
+
+  <g font-family="Arial, Helvetica, sans-serif" fill="#202529">
+    <text x="11" y="5.4" text-anchor="middle" font-size="3.35" font-weight="700">Input CSI</text>
+    <text x="11" y="14.5" text-anchor="middle" font-family="Times New Roman, Times, serif" font-size="3.00"><tspan font-style="italic">H</tspan><tspan> ∈ ℂ</tspan></text>
+    <text x="11" y="18.5" text-anchor="middle" font-family="Times New Roman, Times, serif" font-size="3.00">T×K×Nh×Nv</text>
+
+    <rect x="4" y="21" width="14" height="5" fill="#ffffff" stroke="#8d99a6" stroke-width="0.3"/>
+    <g stroke="#d6dde3" stroke-width="0.2">
+      <line x1="8" y1="21" x2="8" y2="26"/>
+      <line x1="11" y1="21" x2="11" y2="26"/>
+      <line x1="14" y1="21" x2="14" y2="26"/>
+      <line x1="4" y1="22.7" x2="18" y2="22.7"/>
+      <line x1="4" y1="24.4" x2="18" y2="24.4"/>
+    </g>
+
+    <g fill="#dce8f1" stroke="#8d99a6" stroke-width="0.22">
+      <rect x="2" y="29" width="2.25" height="2.25"/><rect x="4.25" y="29" width="2.25" height="2.25"/><rect x="6.5" y="29" width="2.25" height="2.25"/><rect x="8.75" y="29" width="2.25" height="2.25"/><rect x="11" y="29" width="2.25" height="2.25"/><rect x="13.25" y="29" width="2.25" height="2.25"/><rect x="15.5" y="29" width="2.25" height="2.25"/><rect x="17.75" y="29" width="2.25" height="2.25"/>
+      <rect x="2" y="31.25" width="2.25" height="2.25"/><rect x="4.25" y="31.25" width="2.25" height="2.25"/><rect x="6.5" y="31.25" width="2.25" height="2.25"/><rect x="8.75" y="31.25" width="2.25" height="2.25"/><rect x="11" y="31.25" width="2.25" height="2.25"/><rect x="13.25" y="31.25" width="2.25" height="2.25"/><rect x="15.5" y="31.25" width="2.25" height="2.25"/><rect x="17.75" y="31.25" width="2.25" height="2.25"/>
+      <rect x="2" y="33.5" width="2.25" height="2.25"/><rect x="4.25" y="33.5" width="2.25" height="2.25"/><rect x="6.5" y="33.5" width="2.25" height="2.25"/><rect x="8.75" y="33.5" width="2.25" height="2.25"/><rect x="11" y="33.5" width="2.25" height="2.25"/><rect x="13.25" y="33.5" width="2.25" height="2.25"/><rect x="15.5" y="33.5" width="2.25" height="2.25"/><rect x="17.75" y="33.5" width="2.25" height="2.25"/>
+      <rect x="2" y="35.75" width="2.25" height="2.25"/><rect x="4.25" y="35.75" width="2.25" height="2.25"/><rect x="6.5" y="35.75" width="2.25" height="2.25"/><rect x="8.75" y="35.75" width="2.25" height="2.25"/><rect x="11" y="35.75" width="2.25" height="2.25"/><rect x="13.25" y="35.75" width="2.25" height="2.25"/><rect x="15.5" y="35.75" width="2.25" height="2.25"/><rect x="17.75" y="35.75" width="2.25" height="2.25"/>
+    </g>
+    <text x="11" y="43" text-anchor="middle" font-size="2.65">Nh: rows</text>
+    <text x="11" y="47" text-anchor="middle" font-size="2.65">Nv: columns</text>
+  </g>
+
+  <g font-family="Arial, Helvetica, sans-serif" fill="#1f3b2b">
+    <text x="43" y="5.4" text-anchor="middle" font-size="3.35" font-weight="700">Per-Antenna</text>
+    <text x="43" y="10.2" text-anchor="middle" font-size="3.35" font-weight="700">TF Embedding</text>
+
+    <g fill="#ffffff" stroke="#5c7f6b" stroke-width="0.35">
+      <rect x="33" y="16" width="4" height="3.5"/>
+      <rect x="41" y="16" width="4" height="3.5"/>
+      <rect x="49" y="16" width="4" height="3.5"/>
+    </g>
+    <g stroke="#5c7f6b" stroke-width="0.4" fill="none">
+      <path d="M35 19.5 V23 H51"/>
+      <path d="M43 19.5 V23"/>
+      <path d="M51 19.5 V23"/>
+      <path d="M43 23 V25.8" marker-end="url(#arrow-soft)"/>
+    </g>
+
+    <rect x="33" y="27" width="20" height="12" rx="1.2" fill="#ffffff" stroke="#5c7f6b" stroke-width="0.4"/>
+    <text x="43" y="31.5" text-anchor="middle" font-size="3.00">Shared TF</text>
+    <text x="43" y="36" text-anchor="middle" font-size="3.00">Embedding E<tspan baseline-shift="sub" font-size="2.65">θ</tspan></text>
+    <text x="43" y="43.5" text-anchor="middle" font-size="2.65">Shared across antennas</text>
+    <text x="43" y="48" text-anchor="middle" font-size="2.65">No early antenna mixing</text>
+  </g>
+
+  <g font-family="Arial, Helvetica, sans-serif" fill="#3a2f18">
+    <text x="80" y="5.4" text-anchor="middle" font-size="3.35" font-weight="700">Geometry-</text>
+    <text x="80" y="10.2" text-anchor="middle" font-size="3.35" font-weight="700">Preserving Tokens</text>
+
+    <rect x="71" y="16" width="18" height="13.5" fill="#ffffff" stroke="#b7a17a" stroke-width="0.25"/>
+    <rect x="75.5" y="20.5" width="4.5" height="4.5" fill="#fff1d6" stroke="#b7a17a" stroke-width="0.22"/>
+    <g stroke="#e5d6b7" stroke-width="0.18">
+      <line x1="75.5" y1="16" x2="75.5" y2="29.5"/>
+      <line x1="80" y1="16" x2="80" y2="29.5"/>
+      <line x1="84.5" y1="16" x2="84.5" y2="29.5"/>
+      <line x1="71" y1="20.5" x2="89" y2="20.5"/>
+      <line x1="71" y1="25" x2="89" y2="25"/>
+    </g>
+    <text x="80" y="35.5" text-anchor="middle" font-family="Times New Roman, Times, serif" font-size="3.00" font-style="italic">z<tspan baseline-shift="sub" font-size="2.65">t,k,r,c</tspan></text>
+    <text x="80" y="41.8" text-anchor="middle" font-family="Times New Roman, Times, serif" font-size="3.00" font-style="italic">(t, k, r, c)</text>
+    <text x="80" y="48.5" text-anchor="middle" font-size="2.65">Explicit UPA coordinates</text>
+  </g>
+
+  <g font-family="Arial, Helvetica, sans-serif" fill="#333049">
+    <text x="118" y="5.4" text-anchor="middle" font-size="3.35" font-weight="700">UPA</text>
+    <text x="118" y="10.2" text-anchor="middle" font-size="3.35" font-weight="700">Geometry-Aware</text>
+    <text x="118" y="15" text-anchor="middle" font-size="3.35" font-weight="700">Transformer</text>
+
+    <rect x="104" y="19" width="28" height="10" rx="1.2" fill="#ffffff" stroke="#8c84a7" stroke-width="0.35"/>
+    <text x="118" y="23.5" text-anchor="middle" font-size="3.00">Self-Attention</text>
+    <text x="118" y="27.5" text-anchor="middle" font-size="3.00">+ UPA Relative Bias</text>
+
+    <text x="118" y="35" text-anchor="middle" font-family="Times New Roman, Times, serif" font-size="3.00" font-style="italic">B<tspan baseline-shift="sub" font-size="2.65">h</tspan>(Δr,Δc)</text>
+    <text x="118" y="39.5" text-anchor="middle" font-family="Times New Roman, Times, serif" font-size="3.00" font-style="italic">= b<tspan baseline-shift="sub" font-size="2.65">r</tspan><tspan baseline-shift="super" font-size="2.65">h</tspan>(Δr)+b<tspan baseline-shift="sub" font-size="2.65">c</tspan><tspan baseline-shift="super" font-size="2.65">h</tspan>(Δc)</text>
+
+    <rect x="113.5" y="43" width="9" height="9" fill="#ffffff" stroke="#8c84a7" stroke-width="0.25"/>
+    <rect x="116.5" y="46" width="3" height="3" fill="#ded8ee" stroke="#635b84" stroke-width="0.25"/>
+    <line x1="119.5" y1="47.5" x2="124" y2="47.5" stroke="#2f6f8f" stroke-width="0.4" marker-end="url(#arrow-soft)"/>
+    <line x1="118" y1="46" x2="118" y2="42.5" stroke="#2f6f8f" stroke-width="0.4" marker-end="url(#arrow-soft)"/>
+    <text x="123" y="46.2" font-size="2.65" fill="#2f6f8f">Δc</text>
+    <text x="118" y="41.8" text-anchor="middle" font-size="2.65" fill="#2f6f8f">Δr</text>
+  </g>
+
+  <g font-family="Arial, Helvetica, sans-serif" fill="#3f2b30">
+    <text x="158" y="5.4" text-anchor="middle" font-size="3.35" font-weight="700">Masked</text>
+    <text x="158" y="10.2" text-anchor="middle" font-size="3.35" font-weight="700">Reconstruction</text>
+    <text x="158" y="15" text-anchor="middle" font-size="3.35" font-weight="700">&amp; Prediction</text>
+
+    <text x="158" y="20.5" text-anchor="middle" font-size="3.00">Random · Temporal</text>
+    <text x="158" y="24.5" text-anchor="middle" font-size="3.00">Frequency</text>
+
+    <rect x="144.5" y="29" width="5" height="5" fill="#ffffff" stroke="#a98d94" stroke-width="0.25"/>
+    <rect x="146.5" y="31" width="1.5" height="1.5" fill="#d9d9d9" stroke="#8b8b8b" stroke-width="0.15"/>
+    <text x="147" y="38" text-anchor="middle" font-size="2.65">Antenna</text>
+
+    <rect x="153" y="29" width="5" height="5" fill="#ffffff" stroke="#a98d94" stroke-width="0.25"/>
+    <rect x="153" y="30.5" width="5" height="1.5" fill="#d9d9d9" stroke="#8b8b8b" stroke-width="0.15"/>
+    <text x="155.5" y="38" text-anchor="middle" font-size="2.65">Row</text>
+
+    <rect x="161.5" y="29" width="5" height="5" fill="#ffffff" stroke="#a98d94" stroke-width="0.25"/>
+    <rect x="163" y="29" width="1.5" height="5" fill="#d9d9d9" stroke="#8b8b8b" stroke-width="0.15"/>
+    <text x="164" y="38" text-anchor="middle" font-size="2.65">Column</text>
+
+    <rect x="170" y="29" width="5" height="5" fill="#ffffff" stroke="#a98d94" stroke-width="0.25"/>
+    <rect x="171.5" y="30.5" width="2.5" height="2.5" fill="#d9d9d9" stroke="#8b8b8b" stroke-width="0.15"/>
+    <text x="172.5" y="38" text-anchor="middle" font-size="2.65">2D</text>
+    <text x="172.5" y="42" text-anchor="middle" font-size="2.65">Block</text>
+
+    <text x="158" y="48" text-anchor="middle" font-size="2.65"><tspan font-family="Times New Roman, Times, serif" font-style="italic">Ĥ</tspan><tspan font-family="Arial, Helvetica, sans-serif"> Reconstruction · Prediction</tspan></text>
+    <text x="158" y="52" text-anchor="middle" font-size="2.65">Partial-Array Recovery</text>
+  </g>
+
+  <g font-family="Arial, Helvetica, sans-serif" fill="#202529">
+    <text x="53.5" y="63" text-anchor="middle" font-size="2.82">Geometry-Preserving Representation</text>
+    <text x="96" y="63" text-anchor="middle" font-size="2.82">2D Relative Geometry</text>
+    <text x="132" y="63" text-anchor="middle" font-size="2.82">UPA-Structured Pretraining</text>
+  </g>
+  </g>
+</svg>
