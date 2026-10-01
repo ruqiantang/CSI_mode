@@ -42,20 +42,40 @@ class Trainer:
         grad_clip: float | None = 1.0,
         use_amp: bool = False,
         device: torch.device | str | None = None,
+        precision: str = "tf32",
     ) -> None:
         if task_schedule not in ("sample", "sequential"):
             raise ValueError("task_schedule must be 'sample' or 'sequential'")
+        if use_amp:
+            # Legacy alias: --amp historically selected fp16 autocast.
+            precision = "fp16"
+        if precision not in ("tf32", "bf16", "fp16", "fp32"):
+            raise ValueError(
+                f"precision must be one of tf32/bf16/fp16/fp32, got {precision!r}"
+            )
         self.model = model
         self.task_schedule = task_schedule
         self.ratios = dict(DEFAULT_RATIOS if ratios is None else ratios)
         self.grad_clip = grad_clip
-        self.use_amp = use_amp
+        self.precision = precision
         self.device = torch.device(device) if device is not None else torch.device(
             "cuda" if torch.cuda.is_available() else "cpu"
         )
         self.model.to(self.device)
+
+        # TF32 is the WiFo paper's training precision: fp32 with TF32 tensor
+        # cores enabled. fp32 disables it; bf16/fp16 use autocast instead.
+        if precision == "tf32":
+            torch.backends.cuda.matmul.allow_tf32 = True
+            torch.backends.cudnn.allow_tf32 = True
+        elif precision == "fp32":
+            torch.backends.cuda.matmul.allow_tf32 = False
+            torch.backends.cudnn.allow_tf32 = False
+
+        # Only fp16 needs loss scaling; bf16 and tf32 have fp32-like range.
         self.scaler = torch.amp.GradScaler(
-            "cuda", enabled=self.use_amp and self.device.type == "cuda"
+            "cuda",
+            enabled=(self.precision == "fp16") and self.device.type == "cuda",
         )
         self.optimizer = AdamW(
             self.model.parameters(), lr=lr, weight_decay=weight_decay
@@ -82,11 +102,16 @@ class Trainer:
         return random.choice(strategies)
 
     def _autocast_context(self):
-        if not self.use_amp:
-            return torch.autocast("cpu", enabled=False)
-        if self.device.type == "cuda":
-            return torch.autocast("cuda", dtype=torch.float16)
-        return torch.autocast("cpu", dtype=torch.bfloat16)
+        if self.precision == "fp16":
+            if self.device.type == "cuda":
+                return torch.autocast("cuda", dtype=torch.float16)
+            return torch.autocast("cpu", dtype=torch.bfloat16)
+        if self.precision == "bf16":
+            if self.device.type == "cuda":
+                return torch.autocast("cuda", dtype=torch.bfloat16)
+            return torch.autocast("cpu", dtype=torch.bfloat16)
+        # tf32 and fp32 run without autocast.
+        return torch.autocast("cpu", enabled=False)
 
     def _next_eval_task(self) -> str:
         tasks = self.available_tasks()
@@ -160,11 +185,12 @@ class Trainer:
                 if self.task_schedule == "sample"
                 else self.available_tasks()
             )
-            outputs = []
+            n_tasks = len(tasks)
             self.optimizer.zero_grad(set_to_none=True)
+            batch_loss = 0.0
+            batch_flops = 0
             for task in tasks:
                 output = self._run_one(H, task, True)
-                outputs.append(output)
                 counts = task_token_counts.setdefault(
                     task,
                     {"num_tokens": 0, "num_visible_tokens": 0, "batches": 0},
@@ -174,16 +200,23 @@ class Trainer:
                     output["num_visible_tokens"]
                 )
                 counts["batches"] += 1
+                batch_flops += self._estimate_output_flops(H, output)
 
-            total_loss_value = sum(output["loss"] for output in outputs) / len(
-                outputs
-            )
+                # Gradient-mean protocol: backward each task's loss/n_tasks
+                # immediately, so its computation graph is released before the
+                # next task runs. Peak memory stays ~1 task's activations
+                # instead of n_tasks'. The math is identical to averaging the
+                # losses first then one backward.
+                loss = output["loss"] / n_tasks
+                batch_loss += float(loss.detach().cpu())
+                if self.scaler.is_enabled():
+                    self.scaler.scale(loss).backward()
+                else:
+                    loss.backward()
+                del output, loss
+
             if self.scaler.is_enabled():
-                self.scaler.scale(total_loss_value).backward()
                 self.scaler.unscale_(self.optimizer)
-            else:
-                total_loss_value.backward()
-
             if self.grad_clip is not None:
                 nn.utils.clip_grad_norm_(
                     self.model.parameters(), self.grad_clip
@@ -196,13 +229,10 @@ class Trainer:
             if self.scheduler is not None:
                 self.scheduler.step()
 
-            batch_loss = float(total_loss_value.detach().cpu())
             if not math.isfinite(batch_loss):
                 raise RuntimeError(f"non-finite loss at epoch {epoch}: {batch_loss}")
             total_loss += batch_loss
-            total_flops += sum(
-                self._estimate_output_flops(H, output) for output in outputs
-            )
+            total_flops += batch_flops
             batches += 1
 
         if batches == 0:
@@ -379,6 +409,7 @@ class Trainer:
             "epoch": epoch,
             "task_schedule": self.task_schedule,
             "ratios": self.ratios,
+            "precision": self.precision,
             "extra": dict(extra or {}),
         }
         torch.save(payload, path)
@@ -391,4 +422,5 @@ class Trainer:
             self.scheduler.load_state_dict(payload["scheduler"])
         self.task_schedule = payload.get("task_schedule", self.task_schedule)
         self.ratios = payload.get("ratios", self.ratios)
+        self.precision = payload.get("precision", self.precision)
         return int(payload["epoch"])

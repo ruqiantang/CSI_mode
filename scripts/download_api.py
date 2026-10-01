@@ -1,10 +1,40 @@
 #!/usr/bin/env python
 import urllib.request, urllib.parse, json, subprocess, os, sys, time
-TOK = "ory_at_uy-lrQvstadDrWNNmmoXCT3OTIZiLE-FZVeGsQnc2os.6UDoVvhk4-7cQaEpnDg7rpMiUhGq-CQwaZv1doT__mE"
+
+# 仓库根目录（scripts/ 的上一级）
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def _load_dotenv(path):
+    """极简 .env 加载：仅在环境变量尚未设置时写入，不覆盖已有值。"""
+    if not os.path.exists(path):
+        return
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, _, v = line.partition("=")
+            k = k.strip()
+            v = v.strip().strip('"').strip("'")
+            if k and k not in os.environ:
+                os.environ[k] = v
+
+
+_load_dotenv(os.path.join(REPO_ROOT, ".env"))
+
+# 凭据与本地路径均来自环境变量（见 .env.example），不再硬编码进仓库。
+TOK = os.environ.get("ANYSHARE_TOKEN")
+if not TOK:
+    raise SystemExit(
+        "缺少 ANYSHARE_TOKEN：请在仓库根目录创建 .env（参考 .env.example），"
+        "或 export ANYSHARE_TOKEN=ory_at_... 后再运行。"
+    )
+
 REF = "https://disk.pku.edu.cn/anyshare/en-us/link/AA003E48DD5EF343C18ACD92ACF3BB8E3E"
 API = "https://disk.pku.edu.cn/api"
 ROOT = "gns://F587FC39F6FA4FEF8E538C0E216361A3/13D975E9B37D426583414C5CABFFC1BD"
-OUT = "/root/WiFo/data"
+OUT = os.environ.get("ANYSHARE_DATA_DIR", os.path.join(REPO_ROOT, "data"))
 
 def api(path, body=None, retries=5):
     for i in range(retries):

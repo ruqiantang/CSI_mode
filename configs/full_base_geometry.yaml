@@ -1,0 +1,22 @@
+# Full (UPA-aware) Base — formal config.
+# Per-antenna time-frequency embedding, (t,k,r,c) 4d positional encoding,
+# UPA relative bias B(Δr,Δc)=b_r(Δr)+b_c(Δc), and 4 masks
+# (random / temporal / frequency / antenna). Spatial masking is restricted
+# to antenna only — row / column / block are intentionally excluded.
+embed_dim: 512
+decoder_embed_dim: 512
+depth: 6
+decoder_depth: 4
+num_heads: 8
+decoder_num_heads: 8
+mlp_ratio: 2.0
+pt: 4
+pf: 4
+pe_mode: 4d
+use_upa_bias: true
+max_delta_r: 3
+max_delta_c: 7
+allow_spatial_mask: true
+spatial_types:
+  - antenna
+dropout: 0.0

@@ -65,7 +65,6 @@ DATASET_SHAPES: Dict[str, DatasetShape] = {
         ("D16", 16, 32, 4, 8),
         ("D17", 16, 32, 4, 8),
         ("D18", 24, 64, 4, 4),
-        ("D19", 16, 32, 4, 8),
     ]
 }
 
@@ -127,11 +126,14 @@ class TensorCSIDataset(Dataset):
 
 
 class LazyMatCSIDataset(Dataset):
-    """Lazy per-sample reader for MATLAB v7.3 CSI files.
+    """Per-sample reader for MATLAB v7.3 CSI files.
 
-    The public WiFo files store ``[K,N,T,B]`` with one chunk per sample. This
-    dataset keeps HDF5 handles open and should therefore be used with
-    ``num_workers=0`` unless the caller manages HDF5 fork safety explicitly.
+    The public WiFo files store ``[K,N,T,B]`` with one chunk per sample. By
+    default the dataset keeps HDF5 handles open and reads lazily, which is
+    only fork-safe with ``num_workers=0``. Pass ``preload=True`` to read every
+    sample into memory up front and close the handles, making the dataset
+    fork-safe for ``num_workers>0`` (the memory is copy-on-write shared across
+    workers).
     """
 
     def __init__(
@@ -139,6 +141,7 @@ class LazyMatCSIDataset(Dataset):
         paths: Sequence[str | Path],
         upa_shapes: Sequence[Tuple[int, int]],
         max_samples_per_file: int | None = None,
+        preload: bool = False,
     ) -> None:
         if len(paths) != len(upa_shapes):
             raise ValueError("paths and upa_shapes must have equal length")
@@ -199,6 +202,30 @@ class LazyMatCSIDataset(Dataset):
             for _ in range(length)
         ]
 
+        self._cache: list[torch.Tensor] | None = None
+        if preload:
+            cache = []
+            for file_index in range(len(self._datasets)):
+                for sample_index in range(self._offsets[file_index + 1] - self._offsets[file_index]):
+                    cache.append(self._read_sample(file_index, sample_index))
+            self._cache = cache
+            for handle in self._handles:
+                handle.close()
+            self._handles = []
+            self._datasets = []
+
+    def _read_sample(self, file_index: int, sample_index: int) -> torch.Tensor:
+        raw = np.asarray(self._datasets[file_index][..., sample_index])
+        values = _normalise_complex_array(raw)
+        K, N, T = values.shape
+        Nh, Nv = self.upa_shapes[file_index]
+        # MATLAB v7.3 stores [K,N,T]; a sample is reordered to [T,K,N].
+        values = np.transpose(values, (2, 0, 1))
+        tensor = torch.as_tensor(values)
+        if not torch.is_complex(tensor):
+            tensor = tensor.to(torch.complex128)
+        return tensor.reshape(T, K, Nh, Nv)
+
     def __len__(self) -> int:
         return self._offsets[-1]
 
@@ -215,17 +242,10 @@ class LazyMatCSIDataset(Dataset):
         raise IndexError(index)
 
     def __getitem__(self, index: int) -> torch.Tensor:
+        if self._cache is not None:
+            return self._cache[index]
         file_index, sample_index = self._find_index(index)
-        raw = np.asarray(self._datasets[file_index][..., sample_index])
-        values = _normalise_complex_array(raw)
-        K, N, T = values.shape
-        Nh, Nv = self.upa_shapes[file_index]
-        # MATLAB v7.3 stores [K,N,T]; a sample is reordered to [T,K,N].
-        values = np.transpose(values, (2, 0, 1))
-        tensor = torch.as_tensor(values)
-        if not torch.is_complex(tensor):
-            tensor = tensor.to(torch.complex128)
-        return tensor.reshape(T, K, Nh, Nv)
+        return self._read_sample(file_index, sample_index)
 
     def __del__(self) -> None:
         for handle in self._handles:

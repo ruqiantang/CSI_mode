@@ -33,14 +33,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--samples", type=int, default=8)
     parser.add_argument("--batch-size", type=int, default=2)
     parser.add_argument("--device", default=None)
-    parser.add_argument("--amp", action="store_true")
+    parser.add_argument(
+        "--precision",
+        choices=("tf32", "bf16", "fp16", "fp32"),
+        default="tf32",
+        help="falls back to the checkpoint's stored precision when present",
+    )
+    parser.add_argument(
+        "--amp", action="store_true", help="deprecated alias for --precision fp16"
+    )
     args = parser.parse_args()
+    if args.amp:
+        args.precision = "fp16"
     if args.source == "mat" and args.mat_path is None:
         parser.error("--source mat requires --mat-path")
     if args.dataset not in DATASET_SHAPES:
         parser.error(f"unknown dataset {args.dataset}")
-    if args.source == "mat" and args.dataset == "D19":
-        parser.error("D19 is not available from the public Hugging Face listing")
     return args
 
 
@@ -67,11 +75,12 @@ def main() -> None:
 
     dataset = make_dataset(args)
     loader = DataLoader(dataset, batch_size=args.batch_size)
+    precision = payload.get("precision", args.precision)
     trainer = Trainer(
         model,
         task_schedule=payload.get("task_schedule", "sample"),
         ratios=payload.get("ratios"),
-        use_amp=args.amp,
+        precision=precision,
         device=args.device,
     )
     results = {

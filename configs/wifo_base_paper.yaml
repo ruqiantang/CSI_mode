@@ -1,0 +1,18 @@
+# WiFo-Base (paper protocol) — formal config.
+# Flattened-antenna Conv3d (4,4,4) patch, (t,k,s) STF positional encoding,
+# 3 masks (random / temporal / frequency). No UPA bias, no spatial mask.
+embed_dim: 512
+decoder_embed_dim: 512
+depth: 6
+decoder_depth: 4
+num_heads: 8
+decoder_num_heads: 8
+mlp_ratio: 2.0
+pt: 4
+pf: 4
+pe_mode: control
+use_upa_bias: false
+max_delta_r: 3
+max_delta_c: 7
+allow_spatial_mask: false
+dropout: 0.0

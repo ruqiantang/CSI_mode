@@ -36,6 +36,7 @@
 ## 注意事项
 
 - Ory token **会过期**，重新用浏览器打开链接即可拿到新 token。
+- `scripts/download_api.py` 不再硬编码 token：请把 token 写入仓库根目录的 `.env`（`ANYSHARE_TOKEN=ory_at_...`，参考 `.env.example`），或用环境变量传入；输出目录可用 `ANYSHARE_DATA_DIR` 覆盖。
 - 下载 URL 是 S3 直链（`diskasu.pku.edu.cn:10002`），有时效性，需尽快下载。
 - 下载速度实测约 **10 MB/s**（服务器直连网盘 S3 存储）。
 - 数据集结构：`dataset4train/` 下是 `D1`~`D16` 文件夹，每个含 `X_train.mat`（9000 样本）、`X_val.mat`（2000）、`X_test.mat`（1000），共约 34GB。
